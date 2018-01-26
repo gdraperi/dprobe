@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package moby.filesync.v1;
+
+option go_package = "filesync";
+
+service FileSync***REMOVED***
+  rpc DiffCopy(stream BytesMessage) returns (stream BytesMessage);
+  rpc TarStream(stream BytesMessage) returns (stream BytesMessage);
+***REMOVED***
+
+service FileSend***REMOVED***
+  rpc DiffCopy(stream BytesMessage) returns (stream BytesMessage);
+***REMOVED***
+
+
+// BytesMessage contains a chunk of byte data
+message BytesMessage***REMOVED***
+	bytes data = 1;
+***REMOVED***

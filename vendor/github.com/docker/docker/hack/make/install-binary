@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+set -e
+rm -rf "$DEST"
+
+install_binary() ***REMOVED***
+	local file="$1"
+	local target="$***REMOVED***DOCKER_MAKE_INSTALL_PREFIX:=/usr/local***REMOVED***/bin/"
+	if [ "$(go env GOOS)" == "linux" ]; then
+		echo "Installing $(basename $file) to $***REMOVED***target***REMOVED***"
+		mkdir -p "$target"
+		cp -f -L "$file" "$target"
+	else
+		echo "Install is only supported on linux"
+		return 1
+	fi
+***REMOVED***
+
+(
+	DEST="$(dirname $DEST)/binary-daemon"
+	source "$***REMOVED***MAKEDIR***REMOVED***/.binary-setup"
+	install_binary "$***REMOVED***DEST***REMOVED***/$***REMOVED***DOCKER_DAEMON_BINARY_NAME***REMOVED***"
+	install_binary "$***REMOVED***DEST***REMOVED***/$***REMOVED***DOCKER_RUNC_BINARY_NAME***REMOVED***"
+	install_binary "$***REMOVED***DEST***REMOVED***/$***REMOVED***DOCKER_CONTAINERD_BINARY_NAME***REMOVED***"
+	install_binary "$***REMOVED***DEST***REMOVED***/$***REMOVED***DOCKER_CONTAINERD_CTR_BINARY_NAME***REMOVED***"
+	install_binary "$***REMOVED***DEST***REMOVED***/$***REMOVED***DOCKER_CONTAINERD_SHIM_BINARY_NAME***REMOVED***"
+	install_binary "$***REMOVED***DEST***REMOVED***/$***REMOVED***DOCKER_PROXY_BINARY_NAME***REMOVED***"
+	install_binary "$***REMOVED***DEST***REMOVED***/$***REMOVED***DOCKER_INIT_BINARY_NAME***REMOVED***"
+)

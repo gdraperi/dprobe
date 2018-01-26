@@ -1,0 +1,30 @@
+***REMOVED***
+     "Hostname":"",
+     "Domainname": "",
+     "User":"",
+     "Memory": 1000,
+     "MemorySwap":0,
+     "CpuShares": 512,
+     "Cpuset": "0,1",
+     "AttachStdin":false,
+     "AttachStdout":true,
+     "AttachStderr":true,
+     "PortSpecs":null,
+     "Tty":false,
+     "OpenStdin":false,
+     "StdinOnce":false,
+     "Env":null,
+     "Cmd":[
+             "bash"
+     ],
+     "Image":"ubuntu",
+     "Volumes":***REMOVED***
+             "/tmp": ***REMOVED******REMOVED***
+ ***REMOVED***,
+     "WorkingDir":"",
+     "NetworkDisabled": false,
+     "ExposedPorts":***REMOVED***
+             "22/tcp": ***REMOVED******REMOVED***
+ ***REMOVED***,
+     "RestartPolicy": ***REMOVED*** "Name": "always" ***REMOVED***
+***REMOVED***

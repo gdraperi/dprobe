@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+changelogFile=$***REMOVED***1:-CHANGELOG.md***REMOVED***
+
+if [ ! -r "$changelogFile" ]; then
+  echo "Unable to read file $changelogFile" >&2
+  exit 1
+fi
+
+grep -e '^## ' "$changelogFile" | awk '***REMOVED***print$3***REMOVED***' | sort -c -r || exit 2
+
+echo "Congratulations!  Changelog $changelogFile dates are in descending order."

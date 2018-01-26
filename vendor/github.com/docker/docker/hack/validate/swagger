@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -e
+export SCRIPTDIR="$( cd "$( dirname "$***REMOVED***BASH_SOURCE[0]***REMOVED***" )" && pwd )"
+source "$***REMOVED***SCRIPTDIR***REMOVED***/.validate"
+
+IFS=$'\n'
+files=( $(validate_diff --diff-filter=ACMR --name-only -- 'api/swagger.yaml' || true) )
+unset IFS
+
+if [ $***REMOVED***#files[@]***REMOVED*** -gt 0 ]; then
+  yamllint -c $***REMOVED***SCRIPTDIR***REMOVED***/.swagger-yamllint api/swagger.yaml
+  swagger validate api/swagger.yaml
+fi

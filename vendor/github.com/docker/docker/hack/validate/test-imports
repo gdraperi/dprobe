@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Make sure we're not using gos' Testing package any more in integration-cli
+
+export SCRIPTDIR="$( cd "$( dirname "$***REMOVED***BASH_SOURCE[0]***REMOVED***" )" && pwd )"
+source "$***REMOVED***SCRIPTDIR***REMOVED***/.validate"
+
+IFS=$'\n'
+files=( $(validate_diff --diff-filter=ACMR --name-only -- 'integration-cli/*.go' || true) )
+unset IFS
+
+badFiles=()
+for f in "$***REMOVED***files[@]***REMOVED***"; do
+	# skip check_test.go since it *does* use the testing package
+	if [ "$f" = "integration-cli/check_test.go" ]; then
+		continue
+	fi
+
+	# we use "git show" here to validate that what's committed doesn't contain golang built-in testing
+	if git show "$VALIDATE_HEAD:$f" | grep -q testing.T; then
+		if [ "$(echo $f | grep '_test')" ]; then
+			# allow testing.T for non- _test files
+			badFiles+=( "$f" )
+		fi
+	fi
+done
+
+if [ $***REMOVED***#badFiles[@]***REMOVED*** -eq 0 ]; then
+	echo 'Congratulations!  No testing.T found.'
+else
+	***REMOVED***
+		echo "These files use the wrong testing infrastructure:"
+		for f in "$***REMOVED***badFiles[@]***REMOVED***"; do
+			echo " - $f"
+		done
+		echo
+	***REMOVED*** >&2
+	false
+fi

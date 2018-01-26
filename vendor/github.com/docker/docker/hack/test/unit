@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+#
+# Run unit tests
+#
+# TESTFLAGS - add additional test flags. Ex:
+#
+#   TESTFLAGS="-v -run TestBuild" hack/test/unit
+#
+# TESTDIRS - run tests for specified packages. Ex:
+#
+#    TESTDIRS="./pkg/term" hack/test/unit
+#
+set -eu -o pipefail
+
+TESTFLAGS+=" -test.timeout=$***REMOVED***TIMEOUT:-5m***REMOVED***"
+BUILDFLAGS=( -tags "netgo seccomp libdm_no_deferred_remove" )
+TESTDIRS="$***REMOVED***TESTDIRS:-"./..."***REMOVED***"
+
+exclude_paths="/vendor/|/integration"
+pkg_list=$(go list $TESTDIRS | grep -vE "($exclude_paths)")
+
+go test -cover "$***REMOVED***BUILDFLAGS[@]***REMOVED***" $TESTFLAGS $pkg_list

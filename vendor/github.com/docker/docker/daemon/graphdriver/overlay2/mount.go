@@ -1,0 +1,89 @@
+// +build linux
+
+package overlay2
+
+import (
+	"bytes"
+	"encoding/json"
+	"flag"
+	"fmt"
+	"os"
+	"runtime"
+
+	"github.com/docker/docker/pkg/reexec"
+	"golang.org/x/sys/unix"
+)
+
+func init() ***REMOVED***
+	reexec.Register("docker-mountfrom", mountFromMain)
+***REMOVED***
+
+func fatal(err error) ***REMOVED***
+	fmt.Fprint(os.Stderr, err)
+	os.Exit(1)
+***REMOVED***
+
+type mountOptions struct ***REMOVED***
+	Device string
+	Target string
+	Type   string
+	Label  string
+	Flag   uint32
+***REMOVED***
+
+func mountFrom(dir, device, target, mType string, flags uintptr, label string) error ***REMOVED***
+	options := &mountOptions***REMOVED***
+		Device: device,
+		Target: target,
+		Type:   mType,
+		Flag:   uint32(flags),
+		Label:  label,
+	***REMOVED***
+
+	cmd := reexec.Command("docker-mountfrom", dir)
+	w, err := cmd.StdinPipe()
+	if err != nil ***REMOVED***
+		return fmt.Errorf("mountfrom error on pipe creation: %v", err)
+	***REMOVED***
+
+	output := bytes.NewBuffer(nil)
+	cmd.Stdout = output
+	cmd.Stderr = output
+	if err := cmd.Start(); err != nil ***REMOVED***
+		w.Close()
+		return fmt.Errorf("mountfrom error on re-exec cmd: %v", err)
+	***REMOVED***
+	//write the options to the pipe for the untar exec to read
+	if err := json.NewEncoder(w).Encode(options); err != nil ***REMOVED***
+		w.Close()
+		return fmt.Errorf("mountfrom json encode to pipe failed: %v", err)
+	***REMOVED***
+	w.Close()
+
+	if err := cmd.Wait(); err != nil ***REMOVED***
+		return fmt.Errorf("mountfrom re-exec error: %v: output: %v", err, output)
+	***REMOVED***
+	return nil
+***REMOVED***
+
+// mountfromMain is the entry-point for docker-mountfrom on re-exec.
+func mountFromMain() ***REMOVED***
+	runtime.LockOSThread()
+	flag.Parse()
+
+	var options *mountOptions
+
+	if err := json.NewDecoder(os.Stdin).Decode(&options); err != nil ***REMOVED***
+		fatal(err)
+	***REMOVED***
+
+	if err := os.Chdir(flag.Arg(0)); err != nil ***REMOVED***
+		fatal(err)
+	***REMOVED***
+
+	if err := unix.Mount(options.Device, options.Target, options.Type, uintptr(options.Flag), options.Label); err != nil ***REMOVED***
+		fatal(err)
+	***REMOVED***
+
+	os.Exit(0)
+***REMOVED***

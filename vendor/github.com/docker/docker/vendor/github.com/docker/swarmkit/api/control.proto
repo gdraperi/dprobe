@@ -1,0 +1,554 @@
+syntax = "proto3";
+
+package docker.swarmkit.v1;
+
+import "github.com/docker/swarmkit/api/specs.proto";
+import "github.com/docker/swarmkit/api/objects.proto";
+import "github.com/docker/swarmkit/api/types.proto";
+import "gogoproto/gogo.proto";
+import "github.com/docker/swarmkit/protobuf/plugin/plugin.proto";
+
+// Control defines the RPC methods for controlling a cluster.
+service Control ***REMOVED***
+	rpc GetNode(GetNodeRequest) returns (GetNodeResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***;
+	rpc ListNodes(ListNodesRequest) returns (ListNodesResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***;
+	rpc UpdateNode(UpdateNodeRequest) returns (UpdateNodeResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***;
+	rpc RemoveNode(RemoveNodeRequest) returns (RemoveNodeResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***;
+
+	rpc GetTask(GetTaskRequest) returns (GetTaskResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***;
+	rpc ListTasks(ListTasksRequest) returns (ListTasksResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***;
+	rpc RemoveTask(RemoveTaskRequest) returns (RemoveTaskResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***;
+
+	rpc GetService(GetServiceRequest) returns (GetServiceResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***;
+	rpc ListServices(ListServicesRequest) returns (ListServicesResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***;
+	rpc CreateService(CreateServiceRequest) returns (CreateServiceResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***;
+	rpc UpdateService(UpdateServiceRequest) returns (UpdateServiceResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***;
+	rpc RemoveService(RemoveServiceRequest) returns (RemoveServiceResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***;
+
+	rpc GetNetwork(GetNetworkRequest) returns (GetNetworkResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***;
+	rpc ListNetworks(ListNetworksRequest) returns (ListNetworksResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***;
+	rpc CreateNetwork(CreateNetworkRequest) returns (CreateNetworkResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***;
+	rpc RemoveNetwork(RemoveNetworkRequest) returns (RemoveNetworkResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***;
+
+	rpc GetCluster(GetClusterRequest) returns (GetClusterResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***;
+	rpc ListClusters(ListClustersRequest) returns (ListClustersResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***;
+	rpc UpdateCluster(UpdateClusterRequest) returns (UpdateClusterResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***;
+
+	// --- secret APIs ---
+
+	// GetSecret returns a `GetSecretResponse` with a `Secret` with the same
+	// id as `GetSecretRequest.SecretID`
+	// - Returns `NotFound` if the Secret with the given id is not found.
+	// - Returns `InvalidArgument` if the `GetSecretRequest.SecretID` is empty.
+	// - Returns an error if getting fails.
+	rpc GetSecret(GetSecretRequest) returns (GetSecretResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***
+
+	// UpdateSecret returns a `UpdateSecretResponse` with a `Secret` with the same
+	// id as `GetSecretRequest.SecretID`
+	// - Returns `NotFound` if the Secret with the given id is not found.
+	// - Returns `InvalidArgument` if the `GetSecretRequest.SecretID` is empty.
+	// - Returns an error if updating fails.
+	rpc UpdateSecret(UpdateSecretRequest) returns (UpdateSecretResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***;
+
+	// ListSecrets returns a `ListSecretResponse` with a list of all non-internal `Secret`s being
+	// managed, or all secrets matching any name in `ListSecretsRequest.Names`, any
+	// name prefix in `ListSecretsRequest.NamePrefixes`, any id in
+	// `ListSecretsRequest.SecretIDs`, or any id prefix in `ListSecretsRequest.IDPrefixes`.
+	// - Returns an error if listing fails.
+	rpc ListSecrets(ListSecretsRequest) returns (ListSecretsResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***
+	// CreateSecret creates and return a `CreateSecretResponse` with a `Secret` based
+	// on the provided `CreateSecretRequest.SecretSpec`.
+	// - Returns `InvalidArgument` if the `CreateSecretRequest.SecretSpec` is malformed,
+	//   or if the secret data is too long or contains invalid characters.
+	// - Returns an error if the creation fails.
+	rpc CreateSecret(CreateSecretRequest) returns (CreateSecretResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***
+
+	// RemoveSecret removes the secret referenced by `RemoveSecretRequest.ID`.
+	// - Returns `InvalidArgument` if `RemoveSecretRequest.ID` is empty.
+	// - Returns `NotFound` if the a secret named `RemoveSecretRequest.ID` is not found.
+	// - Returns an error if the deletion fails.
+	rpc RemoveSecret(RemoveSecretRequest) returns (RemoveSecretResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***
+
+	// --- config APIs ---
+
+	// GetConfig returns a `GetConfigResponse` with a `Config` with the same
+	// id as `GetConfigRequest.ConfigID`
+	// - Returns `NotFound` if the Config with the given id is not found.
+	// - Returns `InvalidArgument` if the `GetConfigRequest.ConfigID` is empty.
+	// - Returns an error if getting fails.
+	rpc GetConfig(GetConfigRequest) returns (GetConfigResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***
+
+	// UpdateConfig returns a `UpdateConfigResponse` with a `Config` with the same
+	// id as `GetConfigRequest.ConfigID`
+	// - Returns `NotFound` if the Config with the given id is not found.
+	// - Returns `InvalidArgument` if the `GetConfigRequest.ConfigID` is empty.
+	// - Returns an error if updating fails.
+	rpc UpdateConfig(UpdateConfigRequest) returns (UpdateConfigResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***;
+
+	// ListConfigs returns a `ListConfigResponse` with a list of `Config`s being
+	// managed, or all configs matching any name in `ListConfigsRequest.Names`, any
+	// name prefix in `ListConfigsRequest.NamePrefixes`, any id in
+	// `ListConfigsRequest.ConfigIDs`, or any id prefix in `ListConfigsRequest.IDPrefixes`.
+	// - Returns an error if listing fails.
+	rpc ListConfigs(ListConfigsRequest) returns (ListConfigsResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***
+	// CreateConfig creates and return a `CreateConfigResponse` with a `Config` based
+	// on the provided `CreateConfigRequest.ConfigSpec`.
+	// - Returns `InvalidArgument` if the `CreateConfigRequest.ConfigSpec` is malformed,
+	//   or if the config data is too long or contains invalid characters.
+	// - Returns an error if the creation fails.
+	rpc CreateConfig(CreateConfigRequest) returns (CreateConfigResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***
+
+	// RemoveConfig removes the config referenced by `RemoveConfigRequest.ID`.
+	// - Returns `InvalidArgument` if `RemoveConfigRequest.ID` is empty.
+	// - Returns `NotFound` if the a config named `RemoveConfigRequest.ID` is not found.
+	// - Returns an error if the deletion fails.
+	rpc RemoveConfig(RemoveConfigRequest) returns (RemoveConfigResponse) ***REMOVED***
+		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
+	***REMOVED***
+***REMOVED***
+
+message GetNodeRequest ***REMOVED***
+	string node_id = 1;
+***REMOVED***
+
+message GetNodeResponse ***REMOVED***
+	Node node = 1;
+***REMOVED***
+
+message ListNodesRequest ***REMOVED***
+	message Filters ***REMOVED***
+		repeated string names = 1;
+		repeated string id_prefixes = 2;
+		map<string, string> labels = 3;
+		repeated NodeSpec.Membership memberships = 4 [packed=false];
+		repeated NodeRole roles = 5 [packed=false];
+		// NamePrefixes matches all objects with the given prefixes
+		repeated string name_prefixes = 6;
+	***REMOVED***
+
+	Filters filters = 1;
+***REMOVED***
+
+message ListNodesResponse ***REMOVED***
+	repeated Node nodes = 1;
+***REMOVED***
+
+// UpdateNodeRequest requests an update to the specified node. This may be used
+// to request a new availability for a node, such as PAUSE. Invalid updates
+// will be denied and cause an error.
+message UpdateNodeRequest ***REMOVED***
+	string node_id = 1;
+	Version node_version = 2;
+	NodeSpec spec = 3;
+***REMOVED***
+
+message UpdateNodeResponse ***REMOVED***
+	Node node = 1;
+***REMOVED***
+
+// RemoveNodeRequest requests to delete the specified node from store.
+message RemoveNodeRequest ***REMOVED***
+	string node_id = 1;
+	bool force = 2;
+***REMOVED***
+
+message RemoveNodeResponse ***REMOVED***
+***REMOVED***
+
+message GetTaskRequest ***REMOVED***
+	string task_id = 1;
+***REMOVED***
+
+message GetTaskResponse ***REMOVED***
+	Task task = 1;
+***REMOVED***
+
+message RemoveTaskRequest ***REMOVED***
+	string task_id = 1;
+***REMOVED***
+
+message RemoveTaskResponse ***REMOVED***
+***REMOVED***
+
+message ListTasksRequest ***REMOVED***
+	message Filters ***REMOVED***
+		repeated string names = 1;
+		repeated string id_prefixes = 2;
+		map<string, string> labels = 3;
+		repeated string service_ids = 4;
+		repeated string node_ids = 5;
+		repeated docker.swarmkit.v1.TaskState desired_states = 6 [packed=false];
+		// NamePrefixes matches all objects with the given prefixes
+		repeated string name_prefixes = 7;
+		repeated string runtimes = 9;
+
+		// UpToDate matches tasks that are consistent with the current
+		// service definition.
+		// Note: this is intended for internal status reporting rather
+		// than being exposed to users. It may be removed in the future.
+		bool up_to_date = 8;
+	***REMOVED***
+
+	Filters filters = 1;
+***REMOVED***
+
+message ListTasksResponse ***REMOVED***
+	repeated Task tasks = 1;
+***REMOVED***
+
+message CreateServiceRequest ***REMOVED***
+	ServiceSpec spec = 1;
+***REMOVED***
+
+message CreateServiceResponse ***REMOVED***
+	Service service = 1;
+***REMOVED***
+
+message GetServiceRequest ***REMOVED***
+	string service_id = 1;
+	bool insert_defaults = 2;
+***REMOVED***
+
+message GetServiceResponse ***REMOVED***
+	Service service = 1;
+***REMOVED***
+
+message UpdateServiceRequest ***REMOVED***
+	string service_id = 1;
+	Version service_version = 2;
+	ServiceSpec spec = 3;
+
+	enum Rollback ***REMOVED***
+		// This is not a rollback. The spec field of the request will
+		// be honored.
+		NONE = 0;
+
+		// Roll back the service - get spec from the service's
+		// previous_spec.
+		PREVIOUS = 1;
+	***REMOVED***
+
+	// Rollback may be set to PREVIOUS to request a rollback (the service's
+	// spec will be set to the value of its previous_spec field). In this
+	// case, the spec field of this request is ignored.
+	Rollback rollback = 4;
+***REMOVED***
+
+message UpdateServiceResponse ***REMOVED***
+	Service service = 1;
+***REMOVED***
+
+message RemoveServiceRequest ***REMOVED***
+	string service_id = 1;
+***REMOVED***
+
+message RemoveServiceResponse ***REMOVED***
+***REMOVED***
+
+message ListServicesRequest ***REMOVED***
+	message Filters ***REMOVED***
+		repeated string names = 1;
+		repeated string id_prefixes = 2;
+		map<string, string> labels = 3;
+		// NamePrefixes matches all objects with the given prefixes
+		repeated string name_prefixes = 4;
+		repeated string runtimes = 5;
+	***REMOVED***
+
+	Filters filters = 1;
+***REMOVED***
+
+message ListServicesResponse ***REMOVED***
+	repeated Service services = 1;
+***REMOVED***
+
+message CreateNetworkRequest ***REMOVED***
+	NetworkSpec spec = 1;
+***REMOVED***
+
+message CreateNetworkResponse ***REMOVED***
+	Network network = 1;
+***REMOVED***
+
+message GetNetworkRequest ***REMOVED***
+	string name = 1;
+	string network_id = 2;
+***REMOVED***
+
+message GetNetworkResponse ***REMOVED***
+	Network network = 1;
+***REMOVED***
+
+message RemoveNetworkRequest ***REMOVED***
+	string name = 1;
+	string network_id = 2;
+***REMOVED***
+
+message RemoveNetworkResponse ***REMOVED******REMOVED***
+
+message ListNetworksRequest ***REMOVED***
+	message Filters ***REMOVED***
+		repeated string names = 1;
+		repeated string id_prefixes = 2;
+		map<string, string> labels = 3;
+		// NamePrefixes matches all objects with the given prefixes
+		repeated string name_prefixes = 4;
+	***REMOVED***
+
+	Filters filters = 1;
+***REMOVED***
+
+message ListNetworksResponse ***REMOVED***
+	repeated Network networks = 1;
+***REMOVED***
+
+message GetClusterRequest ***REMOVED***
+	string cluster_id = 1;
+***REMOVED***
+
+message GetClusterResponse ***REMOVED***
+	Cluster cluster = 1;
+***REMOVED***
+
+message ListClustersRequest ***REMOVED***
+	message Filters ***REMOVED***
+		repeated string names = 1;
+		repeated string id_prefixes = 2;
+		map<string, string> labels = 3;
+		// NamePrefixes matches all objects with the given prefixes
+		repeated string name_prefixes = 4;
+	***REMOVED***
+
+	Filters filters = 1;
+***REMOVED***
+
+message ListClustersResponse ***REMOVED***
+	repeated Cluster clusters = 1;
+***REMOVED***
+
+// KeyRotation tells UpdateCluster what items to rotate
+message KeyRotation ***REMOVED***
+	// WorkerJoinToken tells UpdateCluster to rotate the worker secret token.
+	bool worker_join_token = 1;
+
+	// ManagerJoinToken tells UpdateCluster to rotate the manager secret token.
+	bool manager_join_token = 2;
+
+	// ManagerUnlockKey tells UpdateCluster to rotate the manager unlock key
+	bool manager_unlock_key = 3;
+
+***REMOVED***
+
+message UpdateClusterRequest ***REMOVED***
+	// ClusterID is the cluster ID to update.
+	string cluster_id = 1;
+
+	// ClusterVersion is the version of the cluster being updated.
+	Version cluster_version = 2;
+
+	// Spec is the new spec to apply to the cluster.
+	ClusterSpec spec = 3;
+
+	// Rotation contains flags for join token and unlock key rotation
+	KeyRotation rotation = 4 [(gogoproto.nullable) = false];
+***REMOVED***
+
+message UpdateClusterResponse ***REMOVED***
+	Cluster cluster = 1;
+***REMOVED***
+
+// GetSecretRequest is the request to get a `Secret` object given a secret id.
+message GetSecretRequest ***REMOVED***
+	string secret_id = 1;
+***REMOVED***
+
+// GetSecretResponse contains the Secret corresponding to the id in
+// `GetSecretRequest`, but the `Secret.Spec.Data` field in each `Secret`
+// object should be nil instead of actually containing the secret bytes.
+message GetSecretResponse ***REMOVED***
+	Secret secret = 1;
+***REMOVED***
+
+message UpdateSecretRequest ***REMOVED***
+	// SecretID is the secret ID to update.
+	string secret_id = 1;
+
+	// SecretVersion is the version of the secret being updated.
+	Version secret_version = 2;
+
+	// Spec is the new spec to apply to the Secret
+	// Only some fields are allowed to be updated.
+	SecretSpec spec = 3;
+***REMOVED***
+
+message UpdateSecretResponse ***REMOVED***
+	Secret secret = 1;
+***REMOVED***
+
+// ListSecretRequest is the request to list all non-internal secrets in the secret store,
+// or all secrets filtered by (name or name prefix or id prefix) and labels.
+message ListSecretsRequest ***REMOVED***
+	message Filters ***REMOVED***
+		repeated string names = 1;
+		repeated string id_prefixes = 2;
+		map<string, string> labels = 3;
+		repeated string name_prefixes = 4;
+	***REMOVED***
+
+	Filters filters = 1;
+***REMOVED***
+
+// ListSecretResponse contains a list of all the secrets that match the name or
+// name prefix filters provided in `ListSecretRequest`.  The `Secret.Spec.Data`
+// field in each `Secret` object should be nil instead of actually containing
+// the secret bytes.
+message ListSecretsResponse ***REMOVED***
+	repeated Secret secrets = 1;
+***REMOVED***
+
+// CreateSecretRequest specifies a new secret (it will not update an existing
+// secret) to create.
+message CreateSecretRequest ***REMOVED***
+	SecretSpec spec = 1;
+***REMOVED***
+
+// CreateSecretResponse contains the newly created `Secret` corresponding to the
+// name in `CreateSecretRequest`.  The `Secret.Spec.Data` field should be nil instead
+// of actually containing the secret bytes.
+message CreateSecretResponse ***REMOVED***
+	Secret secret = 1;
+***REMOVED***
+
+// RemoveSecretRequest contains the ID of the secret that should be removed.  This
+// removes all versions of the secret.
+message RemoveSecretRequest ***REMOVED***
+	string secret_id = 1;
+***REMOVED***
+
+// RemoveSecretResponse is an empty object indicating the successful removal of
+// a secret.
+message RemoveSecretResponse ***REMOVED******REMOVED***
+
+// GetConfigRequest is the request to get a `Config` object given a config id.
+message GetConfigRequest ***REMOVED***
+	string config_id = 1;
+***REMOVED***
+
+// GetConfigResponse contains the Config corresponding to the id in
+// `GetConfigRequest`.
+message GetConfigResponse ***REMOVED***
+	Config config = 1;
+***REMOVED***
+
+message UpdateConfigRequest ***REMOVED***
+	// ConfigID is the config ID to update.
+	string config_id = 1;
+
+	// ConfigVersion is the version of the config being updated.
+	Version config_version = 2;
+
+	// Spec is the new spec to apply to the Config
+	// Only some fields are allowed to be updated.
+	ConfigSpec spec = 3;
+***REMOVED***
+
+message UpdateConfigResponse ***REMOVED***
+	Config config = 1;
+***REMOVED***
+
+// ListConfigRequest is the request to list all configs in the config store,
+// or all configs filtered by (name or name prefix or id prefix) and labels.
+message ListConfigsRequest ***REMOVED***
+	message Filters ***REMOVED***
+		repeated string names = 1;
+		repeated string id_prefixes = 2;
+		map<string, string> labels = 3;
+		repeated string name_prefixes = 4;
+	***REMOVED***
+
+	Filters filters = 1;
+***REMOVED***
+
+// ListConfigResponse contains a list of all the configs that match the name or
+// name prefix filters provided in `ListConfigRequest`.
+message ListConfigsResponse ***REMOVED***
+	repeated Config configs = 1;
+***REMOVED***
+
+// CreateConfigRequest specifies a new config (it will not update an existing
+// config) to create.
+message CreateConfigRequest ***REMOVED***
+	ConfigSpec spec = 1;
+***REMOVED***
+
+// CreateConfigResponse contains the newly created `Config` corresponding to the
+// name in `CreateConfigRequest`.
+message CreateConfigResponse ***REMOVED***
+	Config config = 1;
+***REMOVED***
+
+// RemoveConfigRequest contains the ID of the config that should be removed.  This
+// removes all versions of the config.
+message RemoveConfigRequest ***REMOVED***
+	string config_id = 1;
+***REMOVED***
+
+// RemoveConfigResponse is an empty object indicating the successful removal of
+// a config.
+message RemoveConfigResponse ***REMOVED******REMOVED***

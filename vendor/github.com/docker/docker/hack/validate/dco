@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+export SCRIPTDIR="$( cd "$( dirname "$***REMOVED***BASH_SOURCE[0]***REMOVED***" )" && pwd )"
+source "$***REMOVED***SCRIPTDIR***REMOVED***/.validate"
+
+adds=$(validate_diff --numstat | awk '***REMOVED*** s += $1 ***REMOVED*** END ***REMOVED*** print s ***REMOVED***')
+dels=$(validate_diff --numstat | awk '***REMOVED*** s += $2 ***REMOVED*** END ***REMOVED*** print s ***REMOVED***')
+#notDocs="$(validate_diff --numstat | awk '$3 !~ /^docs\// ***REMOVED*** print $3 ***REMOVED***')"
+
+: $***REMOVED***adds:=0***REMOVED***
+: $***REMOVED***dels:=0***REMOVED***
+
+# "Username may only contain alphanumeric characters or dashes and cannot begin with a dash"
+githubUsernameRegex='[a-zA-Z0-9][a-zA-Z0-9-]+'
+
+# https://github.com/docker/docker/blob/master/CONTRIBUTING.md#sign-your-work
+dcoPrefix='Signed-off-by:'
+dcoRegex="^(Docker-DCO-1.1-)?$dcoPrefix ([^<]+) <([^<>@]+@[^<>]+)>( \\(github: ($githubUsernameRegex)\\))?$"
+
+check_dco() ***REMOVED***
+	grep -qE "$dcoRegex"
+***REMOVED***
+
+if [ $adds -eq 0 -a $dels -eq 0 ]; then
+	echo '0 adds, 0 deletions; nothing to validate! :)'
+else
+	commits=( $(validate_log --format='format:%H%n') )
+	badCommits=()
+	for commit in "$***REMOVED***commits[@]***REMOVED***"; do
+		if [ -z "$(git log -1 --format='format:' --name-status "$commit")" ]; then
+			# no content (ie, Merge commit, etc)
+			continue
+		fi
+		if ! git log -1 --format='format:%B' "$commit" | check_dco; then
+			badCommits+=( "$commit" )
+		fi
+	done
+	if [ $***REMOVED***#badCommits[@]***REMOVED*** -eq 0 ]; then
+		echo "Congratulations!  All commits are properly signed with the DCO!"
+	else
+		***REMOVED***
+			echo "These commits do not have a proper '$dcoPrefix' marker:"
+			for commit in "$***REMOVED***badCommits[@]***REMOVED***"; do
+				echo " - $commit"
+			done
+			echo
+			echo 'Please amend each commit to include a properly formatted DCO marker.'
+			echo
+			echo 'Visit the following URL for information about the Docker DCO:'
+			echo ' https://github.com/docker/docker/blob/master/CONTRIBUTING.md#sign-your-work'
+			echo
+		***REMOVED*** >&2
+		false
+	fi
+fi

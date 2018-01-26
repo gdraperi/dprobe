@@ -1,0 +1,150 @@
+syntax = "proto3";
+
+package containerd.services.snapshots.v1;
+
+import weak "gogoproto/gogo.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "github.com/containerd/containerd/api/types/mount.proto";
+
+option go_package = "github.com/containerd/containerd/api/services/snapshots/v1;snapshots";
+
+// Snapshot service manages snapshots
+service Snapshots ***REMOVED***
+	rpc Prepare(PrepareSnapshotRequest) returns (PrepareSnapshotResponse);
+	rpc View(ViewSnapshotRequest) returns (ViewSnapshotResponse);
+	rpc Mounts(MountsRequest) returns (MountsResponse);
+	rpc Commit(CommitSnapshotRequest) returns (google.protobuf.Empty);
+	rpc Remove(RemoveSnapshotRequest) returns (google.protobuf.Empty);
+	rpc Stat(StatSnapshotRequest) returns (StatSnapshotResponse);
+	rpc Update(UpdateSnapshotRequest) returns (UpdateSnapshotResponse);
+	rpc List(ListSnapshotsRequest) returns (stream ListSnapshotsResponse);
+	rpc Usage(UsageRequest) returns (UsageResponse);
+***REMOVED***
+
+message PrepareSnapshotRequest ***REMOVED***
+	string snapshotter = 1;
+	string key = 2;
+	string parent = 3;
+
+	// Labels are arbitrary data on snapshots.
+	//
+	// The combined size of a key/value pair cannot exceed 4096 bytes.
+	map<string, string> labels  = 4;
+***REMOVED***
+
+message PrepareSnapshotResponse ***REMOVED***
+	repeated containerd.types.Mount mounts = 1;
+***REMOVED***
+
+message ViewSnapshotRequest ***REMOVED***
+	string snapshotter = 1;
+	string key = 2;
+	string parent = 3;
+
+	// Labels are arbitrary data on snapshots.
+	//
+	// The combined size of a key/value pair cannot exceed 4096 bytes.
+	map<string, string> labels  = 4;
+***REMOVED***
+
+message ViewSnapshotResponse ***REMOVED***
+	repeated containerd.types.Mount mounts = 1;
+***REMOVED***
+
+message MountsRequest ***REMOVED***
+	string snapshotter = 1;
+	string key = 2;
+***REMOVED***
+
+message MountsResponse ***REMOVED***
+	repeated containerd.types.Mount mounts = 1;
+***REMOVED***
+
+message RemoveSnapshotRequest ***REMOVED***
+	string snapshotter = 1;
+	string key = 2;
+***REMOVED***
+
+message CommitSnapshotRequest ***REMOVED***
+	string snapshotter = 1;
+	string name = 2;
+	string key = 3;
+
+	// Labels are arbitrary data on snapshots.
+	//
+	// The combined size of a key/value pair cannot exceed 4096 bytes.
+	map<string, string> labels  = 4;
+***REMOVED***
+
+message StatSnapshotRequest ***REMOVED***
+	string snapshotter = 1;
+	string key = 2;
+***REMOVED***
+
+enum Kind ***REMOVED***
+	option (gogoproto.goproto_enum_prefix) = false;
+	option (gogoproto.enum_customname) = "Kind";
+
+	UNKNOWN = 0 [(gogoproto.enumvalue_customname) = "KindUnknown"];
+	VIEW = 1 [(gogoproto.enumvalue_customname) = "KindView"];
+	ACTIVE = 2 [(gogoproto.enumvalue_customname) = "KindActive"];
+	COMMITTED = 3 [(gogoproto.enumvalue_customname) = "KindCommitted"];
+***REMOVED***
+
+message Info ***REMOVED***
+	string name = 1;
+	string parent = 2;
+	Kind kind = 3;
+
+	// CreatedAt provides the time at which the snapshot was created.
+	google.protobuf.Timestamp created_at = 4 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+
+	// UpdatedAt provides the time the info was last updated.
+	google.protobuf.Timestamp updated_at = 5 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+
+	// Labels are arbitrary data on snapshots.
+	//
+	// The combined size of a key/value pair cannot exceed 4096 bytes.
+	map<string, string> labels  = 6;
+***REMOVED***
+
+message StatSnapshotResponse ***REMOVED***
+	Info info = 1 [(gogoproto.nullable) = false];
+***REMOVED***
+
+message UpdateSnapshotRequest ***REMOVED***
+	string snapshotter = 1;
+	Info info = 2 [(gogoproto.nullable) = false];
+
+	// UpdateMask specifies which fields to perform the update on. If empty,
+	// the operation applies to all fields.
+	//
+	// In info, Name, Parent, Kind, Created are immutable,
+	// other field may be updated using this mask.
+	// If no mask is provided, all mutable field are updated.
+	google.protobuf.FieldMask update_mask = 3;
+***REMOVED***
+
+message UpdateSnapshotResponse ***REMOVED***
+	Info info = 1 [(gogoproto.nullable) = false];
+***REMOVED***
+
+message ListSnapshotsRequest***REMOVED***
+	string snapshotter = 1;
+***REMOVED***
+
+message ListSnapshotsResponse ***REMOVED***
+	repeated Info info = 1 [(gogoproto.nullable) = false];
+***REMOVED***
+
+message UsageRequest ***REMOVED***
+	string snapshotter = 1;
+	string key = 2;
+***REMOVED***
+
+message UsageResponse ***REMOVED***
+	int64 size = 1;
+	int64 inodes = 2;
+***REMOVED***

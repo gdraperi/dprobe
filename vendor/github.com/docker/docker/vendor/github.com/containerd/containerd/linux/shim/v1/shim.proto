@@ -1,0 +1,165 @@
+syntax = "proto3";
+
+package containerd.runtime.linux.shim.v1;
+
+import "google/protobuf/any.proto";
+import "google/protobuf/empty.proto";
+import weak "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+import "github.com/containerd/containerd/api/types/mount.proto";
+import "github.com/containerd/containerd/api/types/task/task.proto";
+
+option go_package = "github.com/containerd/containerd/linux/shim/v1;shim";
+
+// Shim service is launched for each container and is responsible for owning the IO
+// for the container and its additional processes.  The shim is also the parent of
+// each container and allows reattaching to the IO and receiving the exit status
+// for the container processes.
+service Shim ***REMOVED***
+	// State returns shim and task state information.
+	rpc State(StateRequest) returns (StateResponse);
+
+	rpc Create(CreateTaskRequest) returns (CreateTaskResponse);
+
+	rpc Start(StartRequest) returns (StartResponse);
+
+	rpc Delete(google.protobuf.Empty) returns (DeleteResponse);
+
+	rpc DeleteProcess(DeleteProcessRequest) returns (DeleteResponse);
+
+	rpc ListPids(ListPidsRequest) returns (ListPidsResponse);
+
+	rpc Pause(google.protobuf.Empty) returns (google.protobuf.Empty);
+
+	rpc Resume(google.protobuf.Empty) returns (google.protobuf.Empty);
+
+	rpc Checkpoint(CheckpointTaskRequest) returns (google.protobuf.Empty);
+
+	rpc Kill(KillRequest) returns (google.protobuf.Empty);
+
+	rpc Exec(ExecProcessRequest) returns (google.protobuf.Empty);
+
+	rpc ResizePty(ResizePtyRequest) returns (google.protobuf.Empty);
+
+	rpc CloseIO(CloseIORequest) returns (google.protobuf.Empty);
+
+	// ShimInfo returns information about the shim.
+	rpc ShimInfo(google.protobuf.Empty) returns (ShimInfoResponse);
+
+	rpc Update(UpdateTaskRequest) returns (google.protobuf.Empty);
+
+	rpc Wait(WaitRequest) returns (WaitResponse);
+***REMOVED***
+
+message CreateTaskRequest ***REMOVED***
+	string id = 1;
+	string bundle = 2;
+	string runtime = 3;
+	repeated containerd.types.Mount rootfs = 4;
+	bool terminal = 5;
+	string stdin = 6;
+	string stdout = 7;
+	string stderr = 8;
+	string checkpoint = 9;
+	string parent_checkpoint = 10;
+	google.protobuf.Any options = 11;
+***REMOVED***
+
+message CreateTaskResponse ***REMOVED***
+	uint32 pid = 1;
+***REMOVED***
+
+message DeleteResponse ***REMOVED***
+	uint32 pid = 1;
+	uint32 exit_status = 2;
+	google.protobuf.Timestamp exited_at = 3 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+***REMOVED***
+
+message DeleteProcessRequest ***REMOVED***
+	string id = 1;
+***REMOVED***
+
+message ExecProcessRequest ***REMOVED***
+	string id = 1;
+	bool terminal = 2;
+	string stdin = 3;
+	string stdout = 4;
+	string stderr = 5;
+	google.protobuf.Any spec = 6;
+***REMOVED***
+
+message ExecProcessResponse ***REMOVED***
+***REMOVED***
+
+message ResizePtyRequest ***REMOVED***
+	string id = 1;
+	uint32 width = 2;
+	uint32 height = 3;
+***REMOVED***
+
+message StateRequest ***REMOVED***
+	string id = 1;
+***REMOVED***
+
+message StateResponse ***REMOVED***
+	string id = 1;
+	string bundle = 2;
+	uint32 pid = 3;
+	containerd.v1.types.Status status = 4;
+	string stdin = 5;
+	string stdout = 6;
+	string stderr = 7;
+	bool terminal = 8;
+	uint32 exit_status = 9;
+	google.protobuf.Timestamp exited_at = 10 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+***REMOVED***
+
+message KillRequest ***REMOVED***
+	string id = 1;
+	uint32 signal = 2;
+	bool all = 3;
+***REMOVED***
+
+message CloseIORequest ***REMOVED***
+	string id = 1;
+	bool stdin = 2;
+***REMOVED***
+
+message ListPidsRequest ***REMOVED***
+	string id = 1;
+***REMOVED***
+
+message ListPidsResponse ***REMOVED***
+	repeated containerd.v1.types.ProcessInfo processes = 1;
+***REMOVED***
+
+message CheckpointTaskRequest ***REMOVED***
+	string path = 1;
+	google.protobuf.Any options = 2;
+***REMOVED***
+
+message ShimInfoResponse ***REMOVED***
+	uint32 shim_pid = 1;
+***REMOVED***
+
+message UpdateTaskRequest ***REMOVED***
+	google.protobuf.Any resources = 1;
+***REMOVED***
+
+message StartRequest ***REMOVED***
+	string id = 1;
+***REMOVED***
+
+message StartResponse ***REMOVED***
+	string id = 1;
+	uint32 pid = 2;
+***REMOVED***
+
+message WaitRequest ***REMOVED***
+	string id = 1;
+***REMOVED***
+
+message WaitResponse ***REMOVED***
+	uint32 exit_status = 1;
+	google.protobuf.Timestamp exited_at = 2 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+***REMOVED***

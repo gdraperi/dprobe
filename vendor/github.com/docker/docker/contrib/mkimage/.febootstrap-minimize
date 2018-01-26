@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -e
+
+rootfsDir="$1"
+shift
+
+(
+	cd "$rootfsDir"
+
+	# effectively: febootstrap-minimize --keep-zoneinfo --keep-rpmdb --keep-services "$target"
+	#  locales
+	rm -rf usr/***REMOVED******REMOVED***lib,share***REMOVED***/locale,***REMOVED***lib,lib64***REMOVED***/gconv,bin/localedef,sbin/build-locale-archive***REMOVED***
+	#  docs and man pages
+	rm -rf usr/share/***REMOVED***man,doc,info,gnome/help***REMOVED***
+	#  cracklib
+	rm -rf usr/share/cracklib
+	#  i18n
+	rm -rf usr/share/i18n
+	#  yum cache
+	rm -rf var/cache/yum
+	mkdir -p --mode=0755 var/cache/yum
+	#  sln
+	rm -rf sbin/sln
+	#  ldconfig
+	#rm -rf sbin/ldconfig
+	rm -rf etc/ld.so.cache var/cache/ldconfig
+	mkdir -p --mode=0755 var/cache/ldconfig
+)

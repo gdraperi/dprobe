@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+#
+# Run all validation
+
+export SCRIPTDIR="$( cd "$( dirname "$***REMOVED***BASH_SOURCE[0]***REMOVED***" )" && pwd )"
+
+. $SCRIPTDIR/default
+. $SCRIPTDIR/vendor

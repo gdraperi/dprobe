@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -e
+
+(
+	export IAMSTATIC='false'
+	export LDFLAGS_STATIC_DOCKER=''
+	export BUILDFLAGS=( "$***REMOVED***BUILDFLAGS[@]/netgo /***REMOVED***" ) # disable netgo, since we don't need it for a dynamic binary
+	export BUILDFLAGS=( "$***REMOVED***BUILDFLAGS[@]/static_build /***REMOVED***" ) # we're not building a "static" binary here
+	source "$***REMOVED***MAKEDIR***REMOVED***/.binary"
+)

@@ -1,0 +1,58 @@
+***REMOVED***
+     "Hostname": "",
+     "Domainname": "",
+     "User": "",
+     "AttachStdin": false,
+     "AttachStdout": true,
+     "AttachStderr": true,
+     "Tty": false,
+     "OpenStdin": false,
+     "StdinOnce": false,
+     "Env": null,
+     "Cmd": [
+             "date"
+     ],
+     "Entrypoint": "bash",
+     "Image": "ubuntu",
+     "Labels": ***REMOVED***
+             "com.example.vendor": "Acme",
+             "com.example.license": "GPL",
+             "com.example.version": "1.0"
+ ***REMOVED***,
+     "Volumes": ***REMOVED***
+             "/tmp": ***REMOVED******REMOVED***
+ ***REMOVED***,
+     "WorkingDir": "",
+     "NetworkDisabled": false,
+     "MacAddress": "12:34:56:78:9a:bc",
+     "ExposedPorts": ***REMOVED***
+             "22/tcp": ***REMOVED******REMOVED***
+ ***REMOVED***,
+     "HostConfig": ***REMOVED***
+       "Binds": ["/tmp:/tmp"],
+       "Links": ["redis3:redis"],
+       "LxcConf": ***REMOVED***"lxc.utsname":"docker"***REMOVED***,
+       "Memory": 1000,
+       "MemorySwap": 0,
+       "CpuShares": 512,
+       "CpusetCpus": "0,1",
+       "PortBindings": ***REMOVED*** "22/tcp": [***REMOVED*** "HostPort": "11022" ***REMOVED***] ***REMOVED***,
+       "PublishAllPorts": false,
+       "Privileged": false,
+       "ReadonlyRootfs": false,
+       "Dns": ["8.8.8.8"],
+       "DnsSearch": [""],
+       "DnsOptions": [""],
+       "ExtraHosts": null,
+       "VolumesFrom": ["parent", "other:ro"],
+       "CapAdd": ["NET_ADMIN"],
+       "CapDrop": ["MKNOD"],
+       "RestartPolicy": ***REMOVED*** "Name": "", "MaximumRetryCount": 0 ***REMOVED***,
+       "NetworkMode": "bridge",
+       "Devices": [],
+       "Ulimits": [***REMOVED******REMOVED***],
+       "LogConfig": ***REMOVED*** "Type": "json-file", "Config": ***REMOVED******REMOVED*** ***REMOVED***,
+       "SecurityOpt": [""],
+       "CgroupParent": ""
+***REMOVED***
+***REMOVED***

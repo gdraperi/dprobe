@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -e
+
+# This script exists as backwards compatibility for CI
+(
+
+    DEST="$***REMOVED***DEST***REMOVED***-daemon"
+    ABS_DEST="$***REMOVED***ABS_DEST***REMOVED***-daemon"
+    . hack/make/dynbinary-daemon
+)

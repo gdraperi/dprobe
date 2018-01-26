@@ -1,0 +1,30 @@
+hello | hello
+hello$***REMOVED***hi***REMOVED***bye | hellobye
+ENV hi=hi
+hello$***REMOVED***hi***REMOVED***bye | hellohibye
+ENV space=abc  def
+hello$***REMOVED***space***REMOVED***bye | helloabc,defbye
+hello"$***REMOVED***space***REMOVED***"bye | helloabc  defbye
+hello "$***REMOVED***space***REMOVED***"bye | hello,abc  defbye
+ENV leading=  ab c
+hello$***REMOVED***leading***REMOVED***def | hello,ab,cdef
+hello"$***REMOVED***leading***REMOVED***" def | hello  ab c,def
+hello"$***REMOVED***leading***REMOVED***" | hello  ab c
+hello$***REMOVED***leading***REMOVED*** | hello,ab,c
+# next line MUST have 3 trailing spaces, don't erase them!
+ENV trailing=ab c   
+hello$***REMOVED***trailing***REMOVED*** | helloab,c
+hello$***REMOVED***trailing***REMOVED***d | helloab,c,d
+hello"$***REMOVED***trailing***REMOVED***"d | helloab c   d
+# next line MUST have 3 trailing spaces, don't erase them!
+hel"lo$***REMOVED***trailing***REMOVED***" | helloab c   
+hello" there  " | hello there  
+hello there     | hello,there
+hello\ there | hello there
+hello" there | error
+hello\" there | hello",there
+hello"\\there" | hello\there
+hello"\there" | hello\there
+hello'\\there' | hello\\there
+hello'\there' | hello\there
+hello'$there' | hello$there
