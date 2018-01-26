@@ -8,9 +8,23 @@ import (
 	"github.com/docker/docker/client"
 )
 
+var cli *client.Client
+
 // GetContainers returns all containers
 // if all is false then only running containers are returned
-func GetContainers(all bool) ***REMOVED***
+func GetContainers(cli *client.Client, all bool) ***REMOVED***
+	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions***REMOVED******REMOVED***)
+	if err != nil ***REMOVED***
+		panic(err)
+	***REMOVED***
+
+	for _, container := range containers ***REMOVED***
+		fmt.Println(container.ID)
+	***REMOVED***
+***REMOVED***
+
+// GetImages returns all images on the host
+func GetImages() ***REMOVED***
 
 ***REMOVED***
 
@@ -21,17 +35,12 @@ func InspectContainer(id string) ***REMOVED***
 ***REMOVED***
 
 func main() ***REMOVED***
-	cli, err := client.NewEnvClient()
+	var err error
+
+	cli, err = client.NewEnvClient()
 	if err != nil ***REMOVED***
 		panic(err)
 	***REMOVED***
 
-	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
-		panic(err)
-	***REMOVED***
-
-	for _, container := range containers ***REMOVED***
-		fmt.Println(container.ID)
-	***REMOVED***
+	GetContainers(cli, true)
 ***REMOVED***
