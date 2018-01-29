@@ -41,8 +41,13 @@ func InspectContainer(cli *client.Client, id string) (types.ContainerJSON, error
 
 // HasPrivilegedExecution returns true/false if the container has
 // privileged execution
-func HasPrivilegedExecution(id string) ***REMOVED***
+func HasPrivilegedExecution(cli *client.Client, id string) (bool, error) ***REMOVED***
+	c_insp, err := InspectContainer(cli, id)
+	if err != nil ***REMOVED***
+		return false, err
+	***REMOVED***
 
+	return c_insp.HostConfig.Privileged, nil
 ***REMOVED***
 
 // HasExtendedCapabilities returns true/false if the container has extended capabilities
@@ -73,6 +78,7 @@ func main() ***REMOVED***
 	fmt.Printf("%+v\n", images)
 
 	for c := range containers ***REMOVED***
-		InspectContainer(cli, containers[c].ID)
+		t, _ := HasPrivilegedExecution(cli, containers[c].ID)
+		fmt.Println(t)
 	***REMOVED***
 ***REMOVED***
