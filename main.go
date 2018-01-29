@@ -51,8 +51,17 @@ func HasPrivilegedExecution(cli *client.Client, id string) (bool, error) ***REMO
 ***REMOVED***
 
 // HasExtendedCapabilities returns true/false if the container has extended capabilities
-func HasExtendedCapabilities(id string) ***REMOVED***
+func HasExtendedCapabilities(cli *client.Client, id string) (bool, error) ***REMOVED***
+	c_insp, err := InspectContainer(cli, id)
+	if err != nil ***REMOVED***
+		return false, err
+	***REMOVED***
 
+	if len(c_insp.HostConfig.CapAdd) > 0 ***REMOVED***
+		return true, nil
+	***REMOVED***
+
+	return false, nil
 ***REMOVED***
 
 func main() ***REMOVED***
@@ -80,5 +89,7 @@ func main() ***REMOVED***
 	for c := range containers ***REMOVED***
 		t, _ := HasPrivilegedExecution(cli, containers[c].ID)
 		fmt.Println(t)
+		s, _ := HasExtendedCapabilities(cli, containers[c].ID)
+		fmt.Println(s)
 	***REMOVED***
 ***REMOVED***
