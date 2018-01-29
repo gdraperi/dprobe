@@ -37,6 +37,17 @@ func InspectContainer(id string) ***REMOVED***
 
 ***REMOVED***
 
+// HasPrivilegedExecution returns true/false if the container has
+// privileged execution
+func HasPrivilegedExecution(id string) ***REMOVED***
+
+***REMOVED***
+
+// HasExtendedCapabilities returns true/false if the container has extended capabilities
+func HasExtendedCapabilities(id string) ***REMOVED***
+
+***REMOVED***
+
 func main() ***REMOVED***
 	var err error
 
