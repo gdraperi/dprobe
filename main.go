@@ -13,13 +13,16 @@ var cli *client.Client
 // GetContainers returns all containers
 // if all is false then only running containers are returned
 func GetContainers(cli *client.Client, all bool) ***REMOVED***
-	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions***REMOVED******REMOVED***)
+	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions***REMOVED***
+		All: all,
+	***REMOVED***)
 	if err != nil ***REMOVED***
 		panic(err)
 	***REMOVED***
 
 	for _, container := range containers ***REMOVED***
 		fmt.Println(container.ID)
+		fmt.Printf("%+v\n", container)
 	***REMOVED***
 ***REMOVED***
 
