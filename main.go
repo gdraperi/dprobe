@@ -23,8 +23,12 @@ func GetContainers(cli *client.Client, all bool) ([]types.Container, error) ***R
 ***REMOVED***
 
 // GetImages returns all images on the host
-func GetImages() ***REMOVED***
+func GetImages(cli *client.Client, all bool) ([]types.ImageSummary, error) ***REMOVED***
+	images, err := cli.ImageList(context.Background(), types.ImageListOptions***REMOVED***
+		All: all,
+	***REMOVED***)
 
+	return images, err
 ***REMOVED***
 
 // InspectContainer returns information about the container back
@@ -47,4 +51,11 @@ func main() ***REMOVED***
 	***REMOVED***
 
 	fmt.Printf("%+v\n", containers)
+
+	images, err := GetImages(cli, true)
+	if err != nil ***REMOVED***
+		log.Fatal(err)
+	***REMOVED***
+
+	fmt.Printf("%+v\n", images)
 ***REMOVED***
