@@ -1,0 +1,32 @@
+package main
+
+type Item struct ***REMOVED***
+	Quantity int
+	Name string
+***REMOVED***
+
+type Config struct ***REMOVED***
+	NumApples int
+	NumOranges int
+	NumBananas int
+***REMOVED***
+
+func main() ***REMOVED***
+	var cfg Config
+	items := []Item***REMOVED***
+		***REMOVED***cfg.NumApples, "apple"***REMOVED***,
+		***REMOVED***cfg.NumOranges, "orange"***REMOVED***,
+		***REMOVED***cfg.NumApples, "banana"***REMOVED***,
+	***REMOVED***
+
+	var a int
+	var b int
+	var c int
+	var d int
+	var e int
+	var f int
+	var g int
+	var h int
+	var i int
+	var j int
+***REMOVED***

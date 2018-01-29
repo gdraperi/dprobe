@@ -1,0 +1,12 @@
+package main
+
+type Dummy struct ***REMOVED***
+	a, b, c int
+***REMOVED***
+
+func testEllipsis(dummies ...*Dummy) ***REMOVED***
+	for i, d := range dummies ***REMOVED***
+		x := dummies[0]
+		
+	***REMOVED***
+***REMOVED***

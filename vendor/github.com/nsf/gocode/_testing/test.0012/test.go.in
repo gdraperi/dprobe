@@ -1,0 +1,11 @@
+package main
+
+type MyMap map[string]int
+
+func main() ***REMOVED***
+	var m MyMap
+	for key, value := range m ***REMOVED***
+		z := m["15"]
+		
+	***REMOVED***
+***REMOVED***

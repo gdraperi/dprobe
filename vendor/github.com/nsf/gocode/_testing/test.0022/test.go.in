@@ -1,0 +1,14 @@
+package main
+
+import "os"
+
+func main() ***REMOVED***
+	for key, value := range getMap() ***REMOVED***
+		
+	***REMOVED***
+***REMOVED***
+
+func getMap() map[string]os.Error ***REMOVED***
+	// simply to trick type inference
+	return nil
+***REMOVED***

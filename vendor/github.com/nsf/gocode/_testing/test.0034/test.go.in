@@ -1,0 +1,8 @@
+package main
+
+import "image/png"
+
+func test() ***REMOVED***
+	img, err := png.Decode(nil)
+	img.
+***REMOVED***

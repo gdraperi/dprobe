@@ -1,0 +1,10 @@
+package main
+
+import "io"
+
+func f() (a, b io.Reader, c error) ***REMOVED*** return a ***REMOVED***
+
+func main() ***REMOVED***
+	a, b, c := f()
+	b.
+***REMOVED***

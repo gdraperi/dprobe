@@ -1,0 +1,18 @@
+package main
+
+type X struct ***REMOVED***
+	Xa int
+	Xb int
+	Xy Y
+***REMOVED***
+
+type Y struct ***REMOVED***
+	Ya int
+	Yb int
+***REMOVED***
+
+func main() ***REMOVED***
+	x := X***REMOVED***
+		Xy: Y***REMOVED***
+			
+***REMOVED***

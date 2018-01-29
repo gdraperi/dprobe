@@ -1,0 +1,9 @@
+package main
+
+func main() ***REMOVED***
+	var err error
+	s := err.Error()
+	for offset, r := range s ***REMOVED***
+		
+	***REMOVED***
+***REMOVED***

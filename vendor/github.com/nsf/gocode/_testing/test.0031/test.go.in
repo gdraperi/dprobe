@@ -1,0 +1,11 @@
+package main
+
+func main() ***REMOVED***
+	var c chan int
+	select ***REMOVED***
+	case c := <-c:
+		_ = c
+		
+	default:
+	***REMOVED***
+***REMOVED***

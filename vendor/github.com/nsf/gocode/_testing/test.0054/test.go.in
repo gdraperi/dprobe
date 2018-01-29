@@ -1,0 +1,16 @@
+package main
+
+type FooBar struct ***REMOVED***
+	A int
+	B int
+	C float64
+***REMOVED***
+
+func (b *FooBar) Foobarer() string ***REMOVED*** return "foobarer" ***REMOVED***
+
+type Bar = FooBar
+
+func main() ***REMOVED***
+	var b Bar
+	b.
+***REMOVED***

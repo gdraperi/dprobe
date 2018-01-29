@@ -1,0 +1,26 @@
+Found 25 candidates:
+  func Errorf(format string, a ...interface***REMOVED******REMOVED***) error
+  func Fprint(w io.Writer, a ...interface***REMOVED******REMOVED***) (n int, err error)
+  func Fprintf(w io.Writer, format string, a ...interface***REMOVED******REMOVED***) (n int, err error)
+  func Fprintln(w io.Writer, a ...interface***REMOVED******REMOVED***) (n int, err error)
+  func Fscan(r io.Reader, a ...interface***REMOVED******REMOVED***) (n int, err error)
+  func Fscanf(r io.Reader, format string, a ...interface***REMOVED******REMOVED***) (n int, err error)
+  func Fscanln(r io.Reader, a ...interface***REMOVED******REMOVED***) (n int, err error)
+  func Print(a ...interface***REMOVED******REMOVED***) (n int, err error)
+  func Printf(format string, a ...interface***REMOVED******REMOVED***) (n int, err error)
+  func Println(a ...interface***REMOVED******REMOVED***) (n int, err error)
+  func Scan(a ...interface***REMOVED******REMOVED***) (n int, err error)
+  func Scanf(format string, a ...interface***REMOVED******REMOVED***) (n int, err error)
+  func Scanln(a ...interface***REMOVED******REMOVED***) (n int, err error)
+  func Sprint(a ...interface***REMOVED******REMOVED***) string
+  func Sprintf(format string, a ...interface***REMOVED******REMOVED***) string
+  func Sprintln(a ...interface***REMOVED******REMOVED***) string
+  func Sscan(str string, a ...interface***REMOVED******REMOVED***) (n int, err error)
+  func Sscanf(str string, format string, a ...interface***REMOVED******REMOVED***) (n int, err error)
+  func Sscanln(str string, a ...interface***REMOVED******REMOVED***) (n int, err error)
+  type Formatter interface
+  type GoStringer interface
+  type ScanState interface
+  type Scanner interface
+  type State interface
+  type Stringer interface

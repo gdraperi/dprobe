@@ -1,0 +1,10 @@
+package main
+
+func main() ***REMOVED***
+	z := 5
+	if y := 20; y == 0 ***REMOVED***
+	***REMOVED***
+	if x := 10; x == 0 ***REMOVED***
+	***REMOVED***
+	
+***REMOVED***

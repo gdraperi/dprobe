@@ -1,0 +1,15 @@
+package main
+
+type ABC struct ***REMOVED***
+	A int
+	B int
+	C int
+***REMOVED***
+
+type ABCAlias = ABC
+
+func main() ***REMOVED***
+	x := ABCAlias***REMOVED***
+		
+	***REMOVED***
+***REMOVED***

@@ -1,0 +1,10 @@
+package main
+
+type X struct ***REMOVED***
+	a,b,c int
+***REMOVED***
+
+func main() ***REMOVED***
+	var X *X
+	X.
+***REMOVED***

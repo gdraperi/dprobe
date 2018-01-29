@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 var cli *client.Client
@@ -38,5 +41,10 @@ func main() ***REMOVED***
 		panic(err)
 	***REMOVED***
 
-	GetContainers(cli, true)
+	containers, err := GetContainers(cli, true)
+	if err != nil ***REMOVED***
+		log.Fatal(err)
+	***REMOVED***
+
+	fmt.Printf("%+v\n", containers)
 ***REMOVED***

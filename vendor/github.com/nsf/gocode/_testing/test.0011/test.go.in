@@ -1,0 +1,8 @@
+package main
+
+import "reflect"
+
+func main() ***REMOVED***
+	var test reflect.Value
+	test.
+***REMOVED***

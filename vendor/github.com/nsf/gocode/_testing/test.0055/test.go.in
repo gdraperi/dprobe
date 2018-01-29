@@ -1,0 +1,21 @@
+package main
+
+type Baz struct ***REMOVED***
+	Jim string
+	John string
+	Kim string
+***REMOVED***
+
+type FooBar struct ***REMOVED***
+	A int
+	B int
+	C float64
+***REMOVED***
+
+func (b *FooBar) Foobarer() Baz ***REMOVED*** return Baz***REMOVED******REMOVED*** ***REMOVED***
+
+func main() ***REMOVED***
+	type Bar = FooBar
+	var b Bar
+	b.Foobarer().
+***REMOVED***

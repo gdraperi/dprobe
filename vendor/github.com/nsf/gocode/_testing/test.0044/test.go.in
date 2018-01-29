@@ -1,0 +1,15 @@
+package main
+
+type X struct ***REMOVED***
+	Xa int
+	Xb int
+***REMOVED***
+
+func (x X) foo() ***REMOVED***
+	return
+***REMOVED***
+
+func main() ***REMOVED***
+	x := X***REMOVED***
+		
+***REMOVED***

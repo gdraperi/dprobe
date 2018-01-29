@@ -1,0 +1,14 @@
+package main
+
+type file struct ***REMOVED***
+	name string
+***REMOVED***
+
+func (file *file) String() ***REMOVED***
+	file.
+	return file.name
+***REMOVED***
+
+func main() ***REMOVED***
+	
+***REMOVED***

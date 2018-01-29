@@ -1,0 +1,19 @@
+package main
+
+func (x *Baz) MethodMe() bool ***REMOVED*** return true ***REMOVED***
+
+func (x *Bar) MethodYou() bool ***REMOVED*** return false ***REMOVED***
+
+type Foo struct ***REMOVED***
+	A int
+	B int
+	C int
+***REMOVED***
+
+type Bar = Foo
+type Baz = Bar
+
+func main() ***REMOVED***
+	var f Foo
+	f.
+***REMOVED***

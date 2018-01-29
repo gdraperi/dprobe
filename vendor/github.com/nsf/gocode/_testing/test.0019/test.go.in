@@ -1,0 +1,7 @@
+package main
+
+import "compress/zlib"
+
+func main() ***REMOVED***
+	var b map[int]zlib.
+***REMOVED***

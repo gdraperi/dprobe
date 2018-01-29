@@ -1,0 +1,8 @@
+package main
+
+import "debug/elf"
+
+func main() ***REMOVED***
+	var f elf.File
+	f.
+***REMOVED***

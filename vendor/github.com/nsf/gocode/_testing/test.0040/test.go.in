@@ -1,0 +1,10 @@
+package main
+
+type Foo struct ***REMOVED******REMOVED***
+
+func (f *Foo) Bar() ***REMOVED******REMOVED***
+
+func create_foo() Foo ***REMOVED***
+	t := Foo***REMOVED******REMOVED***
+	
+***REMOVED***

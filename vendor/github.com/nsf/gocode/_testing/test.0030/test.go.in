@@ -1,0 +1,12 @@
+package main
+
+type A struct ***REMOVED***
+	F1, F2, F3 int
+***REMOVED***
+
+type B A
+
+func main() ***REMOVED***
+	var b B
+	b.
+***REMOVED***

@@ -1,0 +1,14 @@
+package main
+
+func a(a, b, c int) int ***REMOVED***
+	return 123
+***REMOVED***
+
+func main() ***REMOVED***
+	
+***REMOVED***
+
+func b(a, b, c string) string ***REMOVED***
+	return "abc"
+***REMOVED***
+

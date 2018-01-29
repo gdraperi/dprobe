@@ -1,0 +1,14 @@
+package main
+
+type X int
+
+func (x X) PowerOfTwo() int ***REMOVED***
+	return int(x * x)
+***REMOVED***
+
+func main() ***REMOVED***
+	a := X(56)
+	i := a + 67
+	j := ^i
+	j.
+***REMOVED***

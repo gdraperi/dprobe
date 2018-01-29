@@ -1,0 +1,14 @@
+package main
+
+func main() ***REMOVED***
+	var a int
+	for ***REMOVED***
+		var b string
+		if a == len(b) ***REMOVED***
+			var c bool
+		***REMOVED*** else ***REMOVED***
+			var d bool
+			
+		***REMOVED***
+	***REMOVED***
+***REMOVED***

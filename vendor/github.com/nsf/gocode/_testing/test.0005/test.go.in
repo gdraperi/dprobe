@@ -1,0 +1,29 @@
+package main
+
+// this is a file 'a.go'
+
+import (
+	localos "os"
+)
+
+func A() localos.Error ***REMOVED***
+	return nil
+***REMOVED***
+
+// B() is defined in file 'b.go'
+var test = B()
+
+type Tester struct ***REMOVED***
+	a, b, c, d int
+***REMOVED***
+
+func (t *Tester) SetA() ***REMOVED***
+	t.a = 31337
+***REMOVED***
+
+func (t *Tester) SetB() ***REMOVED***
+	t.b = 31337
+***REMOVED***
+
+// methods SetC and SetD are defined in 'b.go'
+
