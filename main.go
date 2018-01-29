@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
@@ -12,18 +11,12 @@ var cli *client.Client
 
 // GetContainers returns all containers
 // if all is false then only running containers are returned
-func GetContainers(cli *client.Client, all bool) ***REMOVED***
+func GetContainers(cli *client.Client, all bool) ([]types.Container, error) ***REMOVED***
 	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions***REMOVED***
 		All: all,
 	***REMOVED***)
-	if err != nil ***REMOVED***
-		panic(err)
-	***REMOVED***
 
-	for _, container := range containers ***REMOVED***
-		fmt.Println(container.ID)
-		fmt.Printf("%+v\n", container)
-	***REMOVED***
+	return containers, err
 ***REMOVED***
 
 // GetImages returns all images on the host
