@@ -33,8 +33,10 @@ func GetImages(cli *client.Client, all bool) ([]types.ImageSummary, error) ***RE
 
 // InspectContainer returns information about the container back
 // id is the id of the container
-func InspectContainer(id string) ***REMOVED***
+func InspectContainer(cli *client.Client, id string) (types.ContainerJSON, error) ***REMOVED***
+	inspection, err := cli.ContainerInspect(context.Background(), id)
 
+	return inspection, err
 ***REMOVED***
 
 // HasPrivilegedExecution returns true/false if the container has
@@ -69,4 +71,8 @@ func main() ***REMOVED***
 	***REMOVED***
 
 	fmt.Printf("%+v\n", images)
+
+	for c := range containers ***REMOVED***
+		InspectContainer(cli, containers[c].ID)
+	***REMOVED***
 ***REMOVED***
