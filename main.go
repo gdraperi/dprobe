@@ -412,5 +412,8 @@ func main() ***REMOVED***
 
 	HasLiveRestore(cli)
 
-	FileOwnedByRoot("/var/lib/docker")
+	ff1, _ := FileOwnedByRoot("/var/lib/docker")
+	fmt.Printf("/var/lib/docker owned by root: %t\n", ff1)
+	ff2, _ := FileOwnedByRoot("/etc/docker")
+	fmt.Printf("/var/lib/docker owned by root: %t\n", ff2)
 ***REMOVED***
