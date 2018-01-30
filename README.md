@@ -14,7 +14,7 @@ Docker security auditing tool
     - DONE: Check if container is using ports < 1024
 - Restrict host access:
     - Do not allow containers access to hosts process namespace
-    - Do not allow containers access to hosts IPC namespace
+    - DONE: Do not allow containers access to hosts IPC namespace
     - DONE: Do not allow containers access to hosts UTS namespace
     - Do not allow containers access to hosts devices
 - Docker daemon audit:

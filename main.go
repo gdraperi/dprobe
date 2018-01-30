@@ -184,6 +184,20 @@ func HasUTSModeHost(cli *client.Client, id string) (bool, error) ***REMOVED***
 	return false, nil
 ***REMOVED***
 
+// HasIPCModeHost returns true if any containers IPCMode is "host"
+func HasIPCModeHost(cli *client.Client, id string) (bool, error) ***REMOVED***
+	c_insp, err := InspectContainer(cli, id)
+	if err != nil ***REMOVED***
+		return false, err
+	***REMOVED***
+
+	if c_insp.HostConfig.IpcMode == "host" ***REMOVED***
+		return true, nil
+	***REMOVED***
+
+	return false, nil
+***REMOVED***
+
 // GetServerInfo returns information about the server
 func GetServerInfo(cli *client.Client) (types.Info, error) ***REMOVED***
 	s_info, err := cli.Info(context.Background())
@@ -287,6 +301,9 @@ func main() ***REMOVED***
 
 		xuuv, _ := HasUTSModeHost(cli, containers[c].ID)
 		fmt.Printf("UTSMode host: %t\n", xuuv)
+
+		xuuvx, _ := HasIPCModeHost(cli, containers[c].ID)
+		fmt.Printf("IPC host: %t\n", xuuvx)
 	***REMOVED***
 
 	v, _ := GetStableDockerCEVersions()
