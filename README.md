@@ -10,7 +10,7 @@ Docker security auditing tool
     - Check if they are running outdated image
     - DONE: Ensure memory limits are set per container
     - DONE: Each container should have HEALTHCHECK
-    - Mount propagation
+    - DONE: Mount propagation
     - Check if container is using ports < 1024
 - Restrict host access:
     - Do not allow containers access to hosts process namespace

@@ -135,6 +135,24 @@ func HasHealthcheck(cli *client.Client, id string) (bool, error) ***REMOVED***
 	return true, nil
 ***REMOVED***
 
+// HasSharedMountPropagation returns true if any of the mount points on a
+// container are shraed propagated
+func HasSharedMountPropagation(cli *client.Client, id string) (bool, error) ***REMOVED***
+	c_insp, err := InspectContainer(cli, id)
+	if err != nil ***REMOVED***
+		return false, err
+	***REMOVED***
+
+	var shared_prop_mounts bool
+	for mount := range c_insp.Mounts ***REMOVED***
+		if c_insp.Mounts[mount].Propagation == "shared" ***REMOVED***
+			shared_prop_mounts = true
+		***REMOVED***
+	***REMOVED***
+
+	return shared_prop_mounts, nil
+***REMOVED***
+
 // GetServerInfo returns information about the server
 func GetServerInfo(cli *client.Client) (types.Info, error) ***REMOVED***
 	s_info, err := cli.Info(context.Background())
@@ -229,6 +247,9 @@ func main() ***REMOVED***
 
 		y, _ := HasHealthcheck(cli, containers[c].ID)
 		fmt.Printf("Health check: %t\n", y)
+
+		x, _ := HasSharedMountPropagation(cli, containers[c].ID)
+		fmt.Printf("Shared propagation: %t\n", x)
 	***REMOVED***
 
 	v, _ := GetStableDockerCEVersions()
