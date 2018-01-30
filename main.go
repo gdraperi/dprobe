@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"strings"
+	"syscall"
 
 	// Docker API
 	"github.com/docker/docker/api/types"
@@ -316,6 +318,30 @@ func HasMemoryLimit(cli *client.Client, id string) (bool, error) ***REMOVED***
 	return false, nil
 ***REMOVED***
 
+// GetFileStats takes a file/directory and returns its file info stat
+func GetFileStats(fname string) (os.FileInfo, error) ***REMOVED***
+	fd, err := os.Stat(fname)
+	if err != nil ***REMOVED***
+		return nil, err
+	***REMOVED***
+
+	return fd, nil
+***REMOVED***
+
+// FileOwnedByRoot returns true if fname owned by root
+func FileOwnedByRoot(fname string) (bool, error) ***REMOVED***
+	fd, err := GetFileStats(fname)
+	if err != nil ***REMOVED***
+		return false, err
+	***REMOVED***
+
+	if fd.Sys().(*syscall.Stat_t).Uid == 0 ***REMOVED***
+		return true, nil
+	***REMOVED***
+
+	return false, nil
+***REMOVED***
+
 func main() ***REMOVED***
 	var err error
 
@@ -385,4 +411,6 @@ func main() ***REMOVED***
 	fmt.Println(b)
 
 	HasLiveRestore(cli)
+
+	FileOwnedByRoot("/var/lib/docker")
 ***REMOVED***

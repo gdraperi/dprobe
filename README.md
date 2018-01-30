@@ -18,7 +18,6 @@ Docker security auditing tool
     - DONE: Do not allow containers access to hosts devices
 - Docker daemon audit:
     - Various directories and configuration
-    - Confirm cgroups configuration
     - Disable swarm mode if it's not in use
 - DONE: Container sprawl
 - DONE: Image sprawl
@@ -28,7 +27,6 @@ Docker security auditing tool
     - Ensure they do not have unnecessary packages
     - Ensure they are not running SSH
     - Use COPY instead of ADD
-    - Use HEALTHCHECK
     - Do not store secrets in Dockerfiles
     - Ensure images are rebuilt with security patches
         - We use ubuntu:trusty (and others); these images need to be rebuilt when there is a security update related to the base image
