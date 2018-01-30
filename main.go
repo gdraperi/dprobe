@@ -121,6 +121,7 @@ func HasExtendedCapabilities(cli *client.Client, id string) (bool, error) ***REM
 	return false, nil
 ***REMOVED***
 
+// HasHealthcheck returns true if there is a healthcheck set for the container
 func HasHealthcheck(cli *client.Client, id string) (bool, error) ***REMOVED***
 	c_insp, err := InspectContainer(cli, id)
 	if err != nil ***REMOVED***
