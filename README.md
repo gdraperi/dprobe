@@ -15,7 +15,7 @@ Docker security auditing tool
     - DONE: Do not allow containers access to hosts process namespace
     - DONE: Do not allow containers access to hosts IPC namespace
     - DONE: Do not allow containers access to hosts UTS namespace
-    - Do not allow containers access to hosts devices
+    - DONE: Do not allow containers access to hosts devices
 - Docker daemon audit:
     - Various directories and configuration
     - Confirm cgroups configuration
