@@ -121,6 +121,19 @@ func HasExtendedCapabilities(cli *client.Client, id string) (bool, error) ***REM
 	return false, nil
 ***REMOVED***
 
+func HasHealthcheck(cli *client.Client, id string) (bool, error) ***REMOVED***
+	c_insp, err := InspectContainer(cli, id)
+	if err != nil ***REMOVED***
+		return false, err
+	***REMOVED***
+
+	if c_insp.Config.Healthcheck == nil ***REMOVED***
+		return false, nil
+	***REMOVED***
+
+	return true, nil
+***REMOVED***
+
 // GetServerInfo returns information about the server
 func GetServerInfo(cli *client.Client) (types.Info, error) ***REMOVED***
 	s_info, err := cli.Info(context.Background())
@@ -212,6 +225,9 @@ func main() ***REMOVED***
 
 		z, _ := HasMemoryLimit(cli, containers[c].ID)
 		fmt.Printf("Memory limit: %t\n", z)
+
+		y, _ := HasHealthcheck(cli, containers[c].ID)
+		fmt.Printf("Health check: %t\n", y)
 	***REMOVED***
 
 	v, _ := GetStableDockerCEVersions()
