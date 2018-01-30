@@ -2,7 +2,7 @@
 Docker security auditing tool
 
 ## Security features
-- TODO: Compare running version with current stable
+- DONE: Compare running version with current stable
 - TODO: Check live restore
 - Audit running containers:
     - Check if they are `Privileged`

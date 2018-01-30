@@ -116,6 +116,26 @@ func HasExtendedCapabilities(cli *client.Client, id string) (bool, error) ***REM
 	return false, nil
 ***REMOVED***
 
+// GetServerInfo returns information about the server
+func GetServerInfo(cli *client.Client) (types.Info, error) ***REMOVED***
+	s_info, err := cli.Info(context.Background())
+	if err != nil ***REMOVED***
+		return s_info, err
+	***REMOVED***
+
+	return s_info, nil
+***REMOVED***
+
+// HasLiveRestore checks if the underlying docker server has --live-restore enabled
+func HasLiveRestore(cli *client.Client) (bool, error) ***REMOVED***
+	s_info, err := GetServerInfo(cli)
+	if err != nil ***REMOVED***
+		return false, err
+	***REMOVED***
+
+	return s_info.LiveRestoreEnabled, nil
+***REMOVED***
+
 func main() ***REMOVED***
 	var err error
 
@@ -152,4 +172,6 @@ func main() ***REMOVED***
 
 	b, _ := HasStableDockerCEVersion()
 	fmt.Println(b)
+
+	HasLiveRestore(cli)
 ***REMOVED***
