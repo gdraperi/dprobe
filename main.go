@@ -198,6 +198,20 @@ func HasIPCModeHost(cli *client.Client, id string) (bool, error) ***REMOVED***
 	return false, nil
 ***REMOVED***
 
+// HasProcessModeHost returns true if any containers Process Mode is "host"
+func HasProcessModeHost(cli *client.Client, id string) (bool, error) ***REMOVED***
+	c_insp, err := InspectContainer(cli, id)
+	if err != nil ***REMOVED***
+		return false, err
+	***REMOVED***
+
+	if c_insp.HostConfig.PidMode == "host" ***REMOVED***
+		return true, nil
+	***REMOVED***
+
+	return false, nil
+***REMOVED***
+
 // GetServerInfo returns information about the server
 func GetServerInfo(cli *client.Client) (types.Info, error) ***REMOVED***
 	s_info, err := cli.Info(context.Background())
@@ -304,6 +318,9 @@ func main() ***REMOVED***
 
 		xuuvx, _ := HasIPCModeHost(cli, containers[c].ID)
 		fmt.Printf("IPC host: %t\n", xuuvx)
+
+		aas, _ := HasProcessModeHost(cli, containers[c].ID)
+		fmt.Printf("Process host: %t\n", aas)
 	***REMOVED***
 
 	v, _ := GetStableDockerCEVersions()

@@ -12,8 +12,7 @@ Docker security auditing tool
     - DONE: Each container should have HEALTHCHECK
     - DONE: Mount propagation
     - DONE: Check if container is using ports < 1024
-- Restrict host access:
-    - Do not allow containers access to hosts process namespace
+    - DONE: Do not allow containers access to hosts process namespace
     - DONE: Do not allow containers access to hosts IPC namespace
     - DONE: Do not allow containers access to hosts UTS namespace
     - Do not allow containers access to hosts devices
