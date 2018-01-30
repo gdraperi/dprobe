@@ -342,18 +342,6 @@ func FileOwnedByRoot(fname string) (bool, error) ***REMOVED***
 	return false, nil
 ***REMOVED***
 
-// FileOwnedByRoot returns true if fname owned by root
-func HasProperFileMode(fname string, mode int) (bool, error) ***REMOVED***
-	fd, err := GetFileStats(fname)
-	if err != nil ***REMOVED***
-		return false, err
-	***REMOVED***
-
-	fmt.Println(fd.Mode().Perm())
-
-	return false, nil
-***REMOVED***
-
 func main() ***REMOVED***
 	var err error
 
@@ -434,7 +422,4 @@ func main() ***REMOVED***
 	fmt.Printf("/usr/bin/docker-containerd owned by root: %t\n", ff4)
 	ff5, _ := FileOwnedByRoot("/usr/bin/docker-runc")
 	fmt.Printf("/usr/bin/docker-runc owned by root: %t\n", ff5)
-
-	ff6, _ := HasProperFileMode("/etc/docker/daemon.json", 0755)
-	fmt.Printf("/etc/docker/daemon.json mode: %d\n", ff6)
 ***REMOVED***

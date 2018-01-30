@@ -18,7 +18,7 @@ Docker security auditing tool
     - DONE: Do not allow containers access to hosts devices
 - Docker daemon audit:
     - DONE: Docker file/directory ownership
-    - Docker file/directory mode
+    - DONE: Docker file/directory mode
     - Disable swarm mode if it's not in use
 - DONE: Container sprawl
 - DONE: Image sprawl
