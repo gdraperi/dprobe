@@ -33,6 +33,21 @@ func GetContainers(cli *client.Client, all bool) ([]types.Container, error) ***R
 	return containers, err
 ***REMOVED***
 
+// HasContainerSprawl takes max amount of containers; if the total tops this
+// then there is container sprawl
+func HasContainerSprawl(cli *client.Client, sprawl_amount int) (bool, error) ***REMOVED***
+	containers, err := GetContainers(cli, true)
+	if err != nil ***REMOVED***
+		return false, err
+	***REMOVED***
+
+	if len(containers) >= sprawl_amount ***REMOVED***
+		return true, nil
+	***REMOVED***
+
+	return false, nil
+***REMOVED***
+
 // GetImages returns all images on the host
 func GetImages(cli *client.Client, all bool) ([]types.ImageSummary, error) ***REMOVED***
 	images, err := cli.ImageList(context.Background(), types.ImageListOptions***REMOVED***
@@ -301,6 +316,9 @@ func main() ***REMOVED***
 	***REMOVED***
 
 	fmt.Printf("%+v\n", containers)
+
+	zztx, _ := HasContainerSprawl(cli, 3)
+	fmt.Printf("Container sprawl: %t\n", zztx)
 
 	images, err := GetImages(cli, true)
 	if err != nil ***REMOVED***
