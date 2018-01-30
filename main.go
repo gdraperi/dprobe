@@ -212,6 +212,20 @@ func HasProcessModeHost(cli *client.Client, id string) (bool, error) ***REMOVED*
 	return false, nil
 ***REMOVED***
 
+// HasHostDevices returns true if a container has access to host devices
+func HasHostDevices(cli *client.Client, id string) (bool, error) ***REMOVED***
+	c_insp, err := InspectContainer(cli, id)
+	if err != nil ***REMOVED***
+		return false, err
+	***REMOVED***
+
+	if len(c_insp.HostConfig.Devices) > 0 ***REMOVED***
+		return true, nil
+	***REMOVED***
+
+	return false, nil
+***REMOVED***
+
 // GetServerInfo returns information about the server
 func GetServerInfo(cli *client.Client) (types.Info, error) ***REMOVED***
 	s_info, err := cli.Info(context.Background())
@@ -314,13 +328,16 @@ func main() ***REMOVED***
 		fmt.Printf("Priv port: %t\n", xuu)
 
 		xuuv, _ := HasUTSModeHost(cli, containers[c].ID)
-		fmt.Printf("UTSMode host: %t\n", xuuv)
+		fmt.Printf("Exposed host UTS: %t\n", xuuv)
 
 		xuuvx, _ := HasIPCModeHost(cli, containers[c].ID)
-		fmt.Printf("IPC host: %t\n", xuuvx)
+		fmt.Printf("Exposed host IPC: %t\n", xuuvx)
 
 		aas, _ := HasProcessModeHost(cli, containers[c].ID)
-		fmt.Printf("Process host: %t\n", aas)
+		fmt.Printf("Exposed host Processes: %t\n", aas)
+
+		abc1, _ := HasHostDevices(cli, containers[c].ID)
+		fmt.Printf("Exposed host Devices: %t\n", abc1)
 	***REMOVED***
 
 	v, _ := GetStableDockerCEVersions()
