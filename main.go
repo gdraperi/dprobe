@@ -56,6 +56,13 @@ func GetStableDockerCEVersions() ([]string, error) ***REMOVED***
 	return versions, nil
 ***REMOVED***
 
+// GetDockerServerVersion returns the local docker server version
+func GetDockerServerVersion(cli *client.Client) (types.Version, error) ***REMOVED***
+	version, err := cli.ServerVersion(context.Background())
+
+	return version, err
+***REMOVED***
+
 // InspectContainer returns information about the container back
 // id is the id of the container
 func InspectContainer(cli *client.Client, id string) (types.ContainerJSON, error) ***REMOVED***
@@ -118,5 +125,8 @@ func main() ***REMOVED***
 		fmt.Println(s)
 	***REMOVED***
 
-	GetStableDockerCEVersions()
+	v, _ := GetStableDockerCEVersions()
+	fmt.Println(v)
+	a, _ := GetDockerServerVersion(cli)
+	fmt.Println(a)
 ***REMOVED***
