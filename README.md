@@ -21,7 +21,7 @@ Docker security auditing tool
     - Confirm cgroups configuration
     - Disable swarm mode if it's not in use
 - DONE: Container sprawl
-- Image sprawl
+- DONE: Image sprawl
 - ECS agent:
     - Version check
 - Image audit:

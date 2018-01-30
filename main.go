@@ -57,6 +57,21 @@ func GetImages(cli *client.Client, all bool) ([]types.ImageSummary, error) ***RE
 	return images, err
 ***REMOVED***
 
+// HasImageSprawl takes max amount of images; if the total tops this
+// then there is image sprawl
+func HasImageSprawl(cli *client.Client, sprawl_amount int) (bool, error) ***REMOVED***
+	images, err := GetImages(cli, true)
+	if err != nil ***REMOVED***
+		return false, err
+	***REMOVED***
+
+	if len(images) >= sprawl_amount ***REMOVED***
+		return true, nil
+	***REMOVED***
+
+	return false, nil
+***REMOVED***
+
 // GetStableDockerCEVersions returns a list of the stable docker versions
 func GetStableDockerCEVersions() ([]string, error) ***REMOVED***
 	doc, err := goquery.NewDocument("https://docs.docker.com/release-notes/docker-ce/")
@@ -319,6 +334,9 @@ func main() ***REMOVED***
 
 	zztx, _ := HasContainerSprawl(cli, 3)
 	fmt.Printf("Container sprawl: %t\n", zztx)
+
+	zztxs, _ := HasImageSprawl(cli, 2)
+	fmt.Printf("Image sprawl: %t\n", zztxs)
 
 	images, err := GetImages(cli, true)
 	if err != nil ***REMOVED***
