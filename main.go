@@ -63,6 +63,26 @@ func GetDockerServerVersion(cli *client.Client) (types.Version, error) ***REMOVE
 	return version, err
 ***REMOVED***
 
+func HasStableDockerCEVersion() (bool, error) ***REMOVED***
+	v, err1 := GetStableDockerCEVersions()
+	if err1 != nil ***REMOVED***
+		return false, err1
+	***REMOVED***
+
+	a, err2 := GetDockerServerVersion(cli)
+	if err2 != nil ***REMOVED***
+		return false, err2
+	***REMOVED***
+
+	for i := range v ***REMOVED***
+		if v[i] == a.Components[0].Version ***REMOVED***
+			return true, nil
+		***REMOVED***
+	***REMOVED***
+
+	return false, fmt.Errorf("%s is not in the list of stable docker CE versions", a)
+***REMOVED***
+
 // InspectContainer returns information about the container back
 // id is the id of the container
 func InspectContainer(cli *client.Client, id string) (types.ContainerJSON, error) ***REMOVED***
@@ -128,5 +148,8 @@ func main() ***REMOVED***
 	v, _ := GetStableDockerCEVersions()
 	fmt.Println(v)
 	a, _ := GetDockerServerVersion(cli)
-	fmt.Println(a)
+	fmt.Printf("%+v\n", a)
+
+	b, _ := HasStableDockerCEVersion()
+	fmt.Println(b)
 ***REMOVED***
