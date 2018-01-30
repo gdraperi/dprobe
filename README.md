@@ -5,10 +5,13 @@ Docker security auditing tool
 - DONE: Compare running version with current stable
 - DONE: Check live restore
 - Audit running containers:
-    - Check if they are `Privileged`
-    - Check if they have `Capabilities`
+    - DONE: Check if they are `Privileged`
+    - DONE: Check if they have `Capabilities`
     - Check if they are running outdated image
-    - Ensure memory limits are set
+    - Ensure memory limits are set per container
+    - Each container should have HEALTHCHECK
+    - Mount propagation
+    - Check if container is using ports < 1024
 - Restrict host access:
     - Do not allow containers access to hosts process namespace
     - Do not allow containers access to hosts IPC namespace

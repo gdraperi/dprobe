@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"strings"
 
 	// Docker API
@@ -14,6 +16,9 @@ import (
 
 	// Logging
 	log "github.com/Sirupsen/logrus"
+
+	// jsonq (easy json parsing)
+	"github.com/jmoiron/jsonq"
 )
 
 var cli *client.Client
@@ -136,6 +141,46 @@ func HasLiveRestore(cli *client.Client) (bool, error) ***REMOVED***
 	return s_info.LiveRestoreEnabled, nil
 ***REMOVED***
 
+// GetContainerStats returns a jq object that can be used to query container stats
+func GetContainerStats(cli *client.Client, id string) (*jsonq.JsonQuery, error) ***REMOVED***
+	c_stats, err := cli.ContainerStats(context.Background(), id, false)
+	if err != nil ***REMOVED***
+		return nil, err
+	***REMOVED***
+	defer c_stats.Body.Close()
+
+	b, err2 := ioutil.ReadAll(c_stats.Body)
+	if err2 != nil ***REMOVED***
+		return nil, err2
+	***REMOVED***
+
+	data := map[string]interface***REMOVED******REMOVED******REMOVED******REMOVED***
+	dec := json.NewDecoder(strings.NewReader(string(b)))
+	dec.Decode(&data)
+	jq := jsonq.NewQuery(data)
+
+	return jq, nil
+***REMOVED***
+
+// HasMemoryLimit returns true if there is a memory limit on the container
+func HasMemoryLimit(cli *client.Client, id string) (bool, error) ***REMOVED***
+	jq, err1 := GetContainerStats(cli, id)
+	if err1 != nil ***REMOVED***
+		return false, err1
+	***REMOVED***
+
+	limit, err := jq.Int("memory_stats", "limit")
+	if err != nil ***REMOVED***
+		return false, err
+	***REMOVED***
+
+	if limit > 0 ***REMOVED***
+		return true, nil
+	***REMOVED***
+
+	return false, nil
+***REMOVED***
+
 func main() ***REMOVED***
 	var err error
 
@@ -164,6 +209,9 @@ func main() ***REMOVED***
 		fmt.Println(t)
 		s, _ := HasExtendedCapabilities(cli, containers[c].ID)
 		fmt.Println(s)
+
+		z, _ := HasMemoryLimit(cli, containers[c].ID)
+		fmt.Printf("Memory limit: %t\n", z)
 	***REMOVED***
 
 	v, _ := GetStableDockerCEVersions()
