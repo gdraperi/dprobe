@@ -170,6 +170,20 @@ func HasPrivilegedPorts(cli *client.Client, id string) (bool, error) ***REMOVED*
 	return priv_port, nil
 ***REMOVED***
 
+// HasUTSModeHost returns true if any containers UTSMode is "host"
+func HasUTSModeHost(cli *client.Client, id string) (bool, error) ***REMOVED***
+	c_insp, err := InspectContainer(cli, id)
+	if err != nil ***REMOVED***
+		return false, err
+	***REMOVED***
+
+	if c_insp.HostConfig.UTSMode == "host" ***REMOVED***
+		return true, nil
+	***REMOVED***
+
+	return false, nil
+***REMOVED***
+
 // GetServerInfo returns information about the server
 func GetServerInfo(cli *client.Client) (types.Info, error) ***REMOVED***
 	s_info, err := cli.Info(context.Background())
@@ -270,6 +284,9 @@ func main() ***REMOVED***
 
 		xuu, _ := HasPrivilegedPorts(cli, containers[c].ID)
 		fmt.Printf("Priv port: %t\n", xuu)
+
+		xuuv, _ := HasUTSModeHost(cli, containers[c].ID)
+		fmt.Printf("UTSMode host: %t\n", xuuv)
 	***REMOVED***
 
 	v, _ := GetStableDockerCEVersions()
