@@ -8,7 +8,7 @@ Docker security auditing tool
     - DONE: Check if they are `Privileged`
     - DONE: Check if they have `Capabilities`
     - Check if they are running outdated image
-    - Ensure memory limits are set per container
+    - DONE: Ensure memory limits are set per container
     - Each container should have HEALTHCHECK
     - Mount propagation
     - Check if container is using ports < 1024
