@@ -416,4 +416,10 @@ func main() ***REMOVED***
 	fmt.Printf("/var/lib/docker owned by root: %t\n", ff1)
 	ff2, _ := FileOwnedByRoot("/etc/docker")
 	fmt.Printf("/var/lib/docker owned by root: %t\n", ff2)
+	ff3, _ := FileOwnedByRoot("/etc/docker/daemon.json")
+	fmt.Printf("/etc/docker/daemon.json owned by root: %t\n", ff3)
+	ff4, _ := FileOwnedByRoot("/usr/bin/docker-containerd")
+	fmt.Printf("/usr/bin/docker-containerd owned by root: %t\n", ff4)
+	ff5, _ := FileOwnedByRoot("/usr/bin/docker-runc")
+	fmt.Printf("/usr/bin/docker-runc owned by root: %t\n", ff5)
 ***REMOVED***
