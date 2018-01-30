@@ -143,6 +143,7 @@ func main() ***REMOVED***
 	if err != nil ***REMOVED***
 		panic(err)
 	***REMOVED***
+	defer cli.Close()
 
 	containers, err := GetContainers(cli, true)
 	if err != nil ***REMOVED***
