@@ -153,6 +153,23 @@ func HasSharedMountPropagation(cli *client.Client, id string) (bool, error) ***R
 	return shared_prop_mounts, nil
 ***REMOVED***
 
+// HasPrivilegedPorts returns true if the container is bound to a privileged port
+func HasPrivilegedPorts(cli *client.Client, id string) (bool, error) ***REMOVED***
+	c_insp, err := InspectContainer(cli, id)
+	if err != nil ***REMOVED***
+		return false, err
+	***REMOVED***
+
+	var priv_port bool
+	for k := range c_insp.NetworkSettings.Ports ***REMOVED***
+		if k.Int() <= 1024 ***REMOVED***
+			priv_port = true
+		***REMOVED***
+	***REMOVED***
+
+	return priv_port, nil
+***REMOVED***
+
 // GetServerInfo returns information about the server
 func GetServerInfo(cli *client.Client) (types.Info, error) ***REMOVED***
 	s_info, err := cli.Info(context.Background())
@@ -250,6 +267,9 @@ func main() ***REMOVED***
 
 		x, _ := HasSharedMountPropagation(cli, containers[c].ID)
 		fmt.Printf("Shared propagation: %t\n", x)
+
+		xuu, _ := HasPrivilegedPorts(cli, containers[c].ID)
+		fmt.Printf("Priv port: %t\n", xuu)
 	***REMOVED***
 
 	v, _ := GetStableDockerCEVersions()

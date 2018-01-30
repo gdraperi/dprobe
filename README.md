@@ -11,7 +11,7 @@ Docker security auditing tool
     - DONE: Ensure memory limits are set per container
     - DONE: Each container should have HEALTHCHECK
     - DONE: Mount propagation
-    - Check if container is using ports < 1024
+    - DONE: Check if container is using ports < 1024
 - Restrict host access:
     - Do not allow containers access to hosts process namespace
     - Do not allow containers access to hosts IPC namespace
