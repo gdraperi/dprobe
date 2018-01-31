@@ -113,7 +113,7 @@ func HasStableDockerCEVersion() (bool, error) ***REMOVED***
 	***REMOVED***
 
 	for i := range v ***REMOVED***
-		if v[i] == a.Components[0].Version ***REMOVED***
+		if v[i] == a.Version ***REMOVED***
 			return true, nil
 		***REMOVED***
 	***REMOVED***
