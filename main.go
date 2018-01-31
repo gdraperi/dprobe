@@ -359,8 +359,13 @@ func GetIPs() ([]net.Addr, error) ***REMOVED***
 ***REMOVED***
 
 // GetInstanceID returns the hosts AWS instance ID
-func GetInstanceID() ***REMOVED***
+func GetInstanceID() (string, error) ***REMOVED***
+	doc, err := goquery.NewDocument("http://169.254.169.254/latest/meta-data/instance-id")
+	if err != nil ***REMOVED***
+		return "", err
+	***REMOVED***
 
+	return doc.Text(), nil
 ***REMOVED***
 
 func main() ***REMOVED***
@@ -369,6 +374,9 @@ func main() ***REMOVED***
 
 	iz2, _ := GetIPs()
 	fmt.Println(iz2)
+
+	iz3, _ := GetInstanceID()
+	fmt.Println(iz3)
 
 	var err error
 
