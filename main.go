@@ -396,6 +396,26 @@ func GetECSAgentVersion() (string, error) ***REMOVED***
 	return v, nil
 ***REMOVED***
 
+// GetECSClusterName returns the name of the current ECS cluster
+func GetECSClusterName() (string, error) ***REMOVED***
+	doc, err := goquery.NewDocument("http://127.0.0.1:51678/v1/metadata")
+	if err != nil ***REMOVED***
+		return "", err
+	***REMOVED***
+
+	data := map[string]interface***REMOVED******REMOVED******REMOVED******REMOVED***
+	dec := json.NewDecoder(strings.NewReader(doc.Text()))
+	dec.Decode(&data)
+	jq := jsonq.NewQuery(data)
+
+	v, err2 := jq.String("Cluster")
+	if err2 != nil ***REMOVED***
+		return "", err2
+	***REMOVED***
+
+	return v, nil
+***REMOVED***
+
 func main() ***REMOVED***
 	iz1, _ := GetHostname()
 	fmt.Println(iz1)
@@ -408,6 +428,9 @@ func main() ***REMOVED***
 
 	iz4, _ := GetECSAgentVersion()
 	fmt.Printf("ECS version: %s\n", iz4)
+
+	iz5, _ := GetECSClusterName()
+	fmt.Printf("ECS Cluster: %s\n", iz5)
 
 	var err error
 

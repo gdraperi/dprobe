@@ -23,8 +23,8 @@ Docker security auditing tool
 - DONE: Container sprawl
 - DONE: Image sprawl
 - ECS agent:
-    - Version check (from /var/lib/ecs/data/ecs_agent_data.json)
-    - Get cluster name (from /var/lib/ecs/data/ecs_agent_data.json)
+    - Version check (from /var/lib/ecs/data/ecs_agent_data.json) 
+    - Get cluster name (from /var/lib/ecs/data/ecs_agent_data.json) "Data"."Cluster"
 - Info gather:
     - DONE: Get hostname
     - DONE: Get instance ID
