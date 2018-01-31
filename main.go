@@ -343,8 +343,8 @@ func FileOwnedByRoot(fname string) (bool, error) ***REMOVED***
 ***REMOVED***
 
 // GetHostname returns the systems hostname
-func GetHostname() ***REMOVED***
-
+func GetHostname() (string, error) ***REMOVED***
+	return os.Hostname()
 ***REMOVED***
 
 // GetIP returns the systems primary IP address
@@ -358,6 +358,9 @@ func GetInstanceID() ***REMOVED***
 ***REMOVED***
 
 func main() ***REMOVED***
+	iz1, _ := GetHostname()
+	fmt.Println(iz1)
+
 	var err error
 
 	cli, err = client.NewEnvClient()
