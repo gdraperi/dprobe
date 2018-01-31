@@ -26,9 +26,9 @@ Docker security auditing tool
     - Version check
     - Get cluster name
 - Info gather:
-    - Get hostname
-    - Get instance ID
-    - Get IP address
+    - DONE: Get hostname
+    - DONE: Get instance ID
+    - DONE: Get IP address
 - Image audit:
     - Ensure they do not have unnecessary packages
     - Ensure they are not running SSH
