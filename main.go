@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net"
 	"os"
+	"regexp"
 	"strings"
 	"syscall"
 
@@ -368,6 +369,33 @@ func GetInstanceID() (string, error) ***REMOVED***
 	return doc.Text(), nil
 ***REMOVED***
 
+// GetECSAgentVersion returns the running ECS agent version
+func GetECSAgentVersion() (string, error) ***REMOVED***
+	doc, err := goquery.NewDocument("http://127.0.0.1:51678/v1/metadata")
+	if err != nil ***REMOVED***
+		return "", err
+	***REMOVED***
+
+	data := map[string]interface***REMOVED******REMOVED******REMOVED******REMOVED***
+	dec := json.NewDecoder(strings.NewReader(doc.Text()))
+	dec.Decode(&data)
+	jq := jsonq.NewQuery(data)
+
+	v, err2 := jq.String("Version")
+	if err2 != nil ***REMOVED***
+		return "", err2
+	***REMOVED***
+
+	re := regexp.MustCompile("[0-9]***REMOVED***1,2***REMOVED***.[0-9]***REMOVED***1,2***REMOVED***.[0-9]***REMOVED***1,2***REMOVED***?")
+	m := re.FindStringSubmatch(v)
+
+	if m != nil ***REMOVED***
+		return m[0], nil
+	***REMOVED***
+
+	return v, nil
+***REMOVED***
+
 func main() ***REMOVED***
 	iz1, _ := GetHostname()
 	fmt.Println(iz1)
@@ -377,6 +405,9 @@ func main() ***REMOVED***
 
 	iz3, _ := GetInstanceID()
 	fmt.Println(iz3)
+
+	iz4, _ := GetECSAgentVersion()
+	fmt.Printf("ECS version: %s\n", iz4)
 
 	var err error
 
