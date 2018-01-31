@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"os"
 	"strings"
 	"syscall"
@@ -347,9 +348,14 @@ func GetHostname() (string, error) ***REMOVED***
 	return os.Hostname()
 ***REMOVED***
 
-// GetIP returns the systems primary IP address
-func GetIP() ***REMOVED***
+// GetIPs returns the local systems IP addresses
+func GetIPs() ([]net.Addr, error) ***REMOVED***
+	addrs, err := net.InterfaceAddrs()
+	if err != nil ***REMOVED***
+		return nil, err
+	***REMOVED***
 
+	return addrs, nil
 ***REMOVED***
 
 // GetInstanceID returns the hosts AWS instance ID
@@ -360,6 +366,9 @@ func GetInstanceID() ***REMOVED***
 func main() ***REMOVED***
 	iz1, _ := GetHostname()
 	fmt.Println(iz1)
+
+	iz2, _ := GetIPs()
+	fmt.Println(iz2)
 
 	var err error
 
