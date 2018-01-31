@@ -24,6 +24,11 @@ Docker security auditing tool
 - DONE: Image sprawl
 - ECS agent:
     - Version check
+    - Get cluster name
+- Info gather:
+    - Get hostname
+    - Get instance ID
+    - Get IP address
 - Image audit:
     - Ensure they do not have unnecessary packages
     - Ensure they are not running SSH

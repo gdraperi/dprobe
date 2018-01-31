@@ -342,6 +342,21 @@ func FileOwnedByRoot(fname string) (bool, error) ***REMOVED***
 	return false, nil
 ***REMOVED***
 
+// GetHostname returns the systems hostname
+func GetHostname() ***REMOVED***
+
+***REMOVED***
+
+// GetIP returns the systems primary IP address
+func GetIP() ***REMOVED***
+
+***REMOVED***
+
+// GetInstanceID returns the hosts AWS instance ID
+func GetInstanceID() ***REMOVED***
+
+***REMOVED***
+
 func main() ***REMOVED***
 	var err error
 
