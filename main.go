@@ -8,6 +8,7 @@ import (
 	"net"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 	"syscall"
 
@@ -433,13 +434,19 @@ func GetHostname() (string, error) ***REMOVED***
 ***REMOVED***
 
 // GetIPs returns the local systems IP addresses
-func GetIPs() ([]net.Addr, error) ***REMOVED***
+func GetIPs() ([]string, error) ***REMOVED***
 	addrs, err := net.InterfaceAddrs()
 	if err != nil ***REMOVED***
 		return nil, err
 	***REMOVED***
 
-	return addrs, nil
+	var strAddrs []string
+	strAddrs = append(strAddrs, "IPs:")
+	for i := range addrs ***REMOVED***
+		strAddrs = append(strAddrs, addrs[i].String())
+	***REMOVED***
+
+	return strAddrs, nil
 ***REMOVED***
 
 // GetInstanceID returns the hosts AWS instance ID
@@ -540,23 +547,6 @@ func main() ***REMOVED***
 	PreInit()
 	InitViper()
 
-	iz1, _ := GetHostname()
-
-	MakeOutput("stdout", "Hostname:", iz1)
-	fmt.Println(message)
-
-	iz2, _ := GetIPs()
-	fmt.Println(iz2)
-
-	iz3, _ := GetInstanceID()
-	fmt.Println(iz3)
-
-	iz4, _ := GetECSAgentVersion()
-	fmt.Printf("ECS version: %s\n", iz4)
-
-	iz5, _ := GetECSClusterName()
-	fmt.Printf("ECS Cluster: %s\n", iz5)
-
 	var err error
 
 	cli, err = client.NewEnvClient()
@@ -570,70 +560,160 @@ func main() ***REMOVED***
 		log.Fatal(err)
 	***REMOVED***
 
-	fmt.Printf("%+v\n", containers)
+	//images, err := GetImages(cli, true)
+	//if err != nil ***REMOVED***
+	//	log.Fatal(err)
+	//***REMOVED***
 
-	zztx, _ := HasContainerSprawl(cli, 3)
-	fmt.Printf("Container sprawl: %t\n", zztx)
+	iz1, err1 := GetHostname()
+	if err1 != nil ***REMOVED***
+		log.Fatal(err1)
+	***REMOVED***
+	MakeOutput("stdout", "Hostname:", iz1)
 
-	zztxs, _ := HasImageSprawl(cli, 2)
-	fmt.Printf("Image sprawl: %t\n", zztxs)
+	iz2, err2 := GetIPs()
+	if err2 != nil ***REMOVED***
+		log.Fatal(err2)
+	***REMOVED***
+	MakeOutput("stdout", iz2...)
 
-	images, err := GetImages(cli, true)
-	if err != nil ***REMOVED***
-		log.Fatal(err)
+	iz3, err3 := GetInstanceID()
+	if err3 != nil ***REMOVED***
+		log.Error(err3)
+	***REMOVED***
+	if len(iz3) > 0 ***REMOVED***
+		MakeOutput("stdout", "Instance ID:", iz3)
 	***REMOVED***
 
-	fmt.Printf("%+v\n", images)
+	iz4, err4 := GetECSAgentVersion()
+	if err4 != nil ***REMOVED***
+		log.Error(err4)
+	***REMOVED***
+	if len(iz4) > 0 ***REMOVED***
+		MakeOutput("stdout", "ECS version:", iz4)
+	***REMOVED***
+
+	iz5, err5 := GetECSClusterName()
+	if err5 != nil ***REMOVED***
+		log.Error(err5)
+	***REMOVED***
+	if len(iz5) > 0 ***REMOVED***
+		MakeOutput("stdout", "ECS Cluster:", iz5)
+	***REMOVED***
+
+	iz6, err6 := HasContainerSprawl(cli, 3)
+	if err6 != nil ***REMOVED***
+		log.Error(err6)
+	***REMOVED***
+	strconv.FormatBool(iz6)
+	MakeOutput("stdout", "Container sprawl:", strconv.FormatBool(iz6))
+
+	iz7, err7 := HasImageSprawl(cli, 2)
+	if err7 != nil ***REMOVED***
+		log.Error(err7)
+	***REMOVED***
+	strconv.FormatBool(iz7)
+	MakeOutput("stdout", "Image sprawl:", strconv.FormatBool(iz7))
 
 	for c := range containers ***REMOVED***
-		t, _ := HasPrivilegedExecution(cli, containers[c].ID)
-		fmt.Println(t)
-		s, _ := HasExtendedCapabilities(cli, containers[c].ID)
-		fmt.Println(s)
+		MakeOutput("stdout", "Container ID:", containers[c].ID)
 
-		z, _ := HasMemoryLimit(cli, containers[c].ID)
-		fmt.Printf("Memory limit: %t\n", z)
+		iz8, err8 := HasPrivilegedExecution(cli, containers[c].ID)
+		if err8 != nil ***REMOVED***
+			log.Error(err8)
+		***REMOVED***
+		MakeOutput("stdout", "Privileged Execution:", strconv.FormatBool(iz8))
 
-		y, _ := HasHealthcheck(cli, containers[c].ID)
-		fmt.Printf("Health check: %t\n", y)
+		iz9, err9 := HasExtendedCapabilities(cli, containers[c].ID)
+		if err9 != nil ***REMOVED***
+			log.Error(err9)
+		***REMOVED***
+		MakeOutput("stdout", "Extended Capabilities:", strconv.FormatBool(iz9))
 
-		x, _ := HasSharedMountPropagation(cli, containers[c].ID)
-		fmt.Printf("Shared propagation: %t\n", x)
+		iz10, err10 := HasHealthcheck(cli, containers[c].ID)
+		if err10 != nil ***REMOVED***
+			log.Error(err10)
+		***REMOVED***
+		MakeOutput("stdout", "Memory limit:", strconv.FormatBool(iz10))
 
-		xuu, _ := HasPrivilegedPorts(cli, containers[c].ID)
-		fmt.Printf("Priv port: %t\n", xuu)
+		iz11, err11 := HasSharedMountPropagation(cli, containers[c].ID)
+		if err11 != nil ***REMOVED***
+			log.Error(err11)
+		***REMOVED***
+		MakeOutput("stdout", "Shared Propagation:", strconv.FormatBool(iz11))
 
-		xuuv, _ := HasUTSModeHost(cli, containers[c].ID)
-		fmt.Printf("Exposed host UTS: %t\n", xuuv)
+		iz12, err12 := HasPrivilegedPorts(cli, containers[c].ID)
+		if err12 != nil ***REMOVED***
+			log.Error(err12)
+		***REMOVED***
+		MakeOutput("stdout", "Privileged Ports:", strconv.FormatBool(iz12))
 
-		xuuvx, _ := HasIPCModeHost(cli, containers[c].ID)
-		fmt.Printf("Exposed host IPC: %t\n", xuuvx)
+		iz13, err13 := HasUTSModeHost(cli, containers[c].ID)
+		if err13 != nil ***REMOVED***
+			log.Error(err13)
+		***REMOVED***
+		MakeOutput("stdout", "UTS Mode Host:", strconv.FormatBool(iz13))
 
-		aas, _ := HasProcessModeHost(cli, containers[c].ID)
-		fmt.Printf("Exposed host Processes: %t\n", aas)
+		iz14, err14 := HasIPCModeHost(cli, containers[c].ID)
+		if err14 != nil ***REMOVED***
+			log.Error(err14)
+		***REMOVED***
+		MakeOutput("stdout", "IPC Mode Host:", strconv.FormatBool(iz14))
 
-		abc1, _ := HasHostDevices(cli, containers[c].ID)
-		fmt.Printf("Exposed host Devices: %t\n", abc1)
+		iz15, err15 := HasProcessModeHost(cli, containers[c].ID)
+		if err15 != nil ***REMOVED***
+			log.Error(err15)
+		***REMOVED***
+		MakeOutput("stdout", "Process Mode Host:", strconv.FormatBool(iz15))
+
+		iz16, err16 := HasHostDevices(cli, containers[c].ID)
+		if err16 != nil ***REMOVED***
+			log.Error(err16)
+		***REMOVED***
+		MakeOutput("stdout", "Has Host Devices:", strconv.FormatBool(iz16))
 	***REMOVED***
 
-	v, _ := GetStableDockerCEVersions()
-	fmt.Println(v)
-	a, _ := GetDockerServerVersion(cli)
-	fmt.Printf("%+v\n", a)
+	iz17, err17 := HasStableDockerCEVersion()
+	if err17 != nil ***REMOVED***
+		log.Error(err17)
+	***REMOVED***
+	MakeOutput("stdout", "Stable docker version:", strconv.FormatBool(iz17))
 
-	b, _ := HasStableDockerCEVersion()
-	fmt.Println(b)
+	iz18, err18 := HasLiveRestore(cli)
+	if err18 != nil ***REMOVED***
+		log.Error(err18)
+	***REMOVED***
+	MakeOutput("stdout", "Live Restore:", strconv.FormatBool(iz18))
 
-	HasLiveRestore(cli)
+	iz19, err19 := FileOwnedByRoot("/var/lib/docker")
+	if err19 != nil ***REMOVED***
+		log.Error(err19)
+	***REMOVED***
+	MakeOutput("stdout", "/var/lib/docker owned by root:", strconv.FormatBool(iz19))
 
-	ff1, _ := FileOwnedByRoot("/var/lib/docker")
-	fmt.Printf("/var/lib/docker owned by root: %t\n", ff1)
-	ff2, _ := FileOwnedByRoot("/etc/docker")
-	fmt.Printf("/var/lib/docker owned by root: %t\n", ff2)
-	ff3, _ := FileOwnedByRoot("/etc/docker/daemon.json")
-	fmt.Printf("/etc/docker/daemon.json owned by root: %t\n", ff3)
-	ff4, _ := FileOwnedByRoot("/usr/bin/docker-containerd")
-	fmt.Printf("/usr/bin/docker-containerd owned by root: %t\n", ff4)
-	ff5, _ := FileOwnedByRoot("/usr/bin/docker-runc")
-	fmt.Printf("/usr/bin/docker-runc owned by root: %t\n", ff5)
+	iz20, err20 := FileOwnedByRoot("/etc/docker")
+	if err20 != nil ***REMOVED***
+		log.Error(err20)
+	***REMOVED***
+	MakeOutput("stdout", "/etc/docker owned by root:", strconv.FormatBool(iz20))
+
+	iz21, err21 := FileOwnedByRoot("/etc/docker/daemon.json")
+	if err21 != nil ***REMOVED***
+		log.Error(err21)
+	***REMOVED***
+	MakeOutput("stdout", "/etc/docker/daemon.json owned by root:", strconv.FormatBool(iz21))
+
+	iz22, err22 := FileOwnedByRoot("/usr/bin/docker-containerd")
+	if err22 != nil ***REMOVED***
+		log.Error(err22)
+	***REMOVED***
+	MakeOutput("stdout", "/usr/bin/docker-containerd owned by root:", strconv.FormatBool(iz22))
+
+	iz23, err23 := FileOwnedByRoot("/usr/bin/docker-runc")
+	if err23 != nil ***REMOVED***
+		log.Error(err23)
+	***REMOVED***
+	MakeOutput("stdout", "/usr/bin/docker-runc owned by root:", strconv.FormatBool(iz23))
+
+	fmt.Println(message)
 ***REMOVED***
