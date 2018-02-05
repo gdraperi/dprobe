@@ -1,0 +1,15 @@
+
+***REMOVED***
+   "options": ***REMOVED***"failByDrop": false***REMOVED***,
+   "outdir": "./reports/clients",
+   "servers": [
+        ***REMOVED***"agent": "ReadAllWriteMessage", "url": "ws://localhost:9000/m", "options": ***REMOVED***"version": 18***REMOVED******REMOVED***,
+        ***REMOVED***"agent": "ReadAllWritePreparedMessage", "url": "ws://localhost:9000/p", "options": ***REMOVED***"version": 18***REMOVED******REMOVED***,
+        ***REMOVED***"agent": "ReadAllWrite", "url": "ws://localhost:9000/r", "options": ***REMOVED***"version": 18***REMOVED******REMOVED***,
+        ***REMOVED***"agent": "CopyFull", "url": "ws://localhost:9000/f", "options": ***REMOVED***"version": 18***REMOVED******REMOVED***,
+        ***REMOVED***"agent": "CopyWriterOnly", "url": "ws://localhost:9000/c", "options": ***REMOVED***"version": 18***REMOVED******REMOVED***
+    ],
+   "cases": ["*"],
+   "exclude-cases": [],
+   "exclude-agent-cases": ***REMOVED******REMOVED***
+***REMOVED***

@@ -11,6 +11,9 @@ import (
 	"strings"
 	"syscall"
 
+	// Slack API
+	"github.com/nlopes/slack"
+
 	// Docker API
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
@@ -25,7 +28,16 @@ import (
 	"github.com/jmoiron/jsonq"
 )
 
-var cli *client.Client
+var (
+	cli      *client.Client
+	cfgSlack Slack
+)
+
+// Slack is the configuration for writing feed data to slack channels
+type Slack struct ***REMOVED***
+	Channel string
+	Token   string
+***REMOVED***
 
 // GetContainers returns all containers
 // if all is false then only running containers are returned
@@ -386,7 +398,7 @@ func GetECSAgentVersion() (string, error) ***REMOVED***
 		return "", err2
 	***REMOVED***
 
-	re := regexp.MustCompile("[0-9]***REMOVED***1,2***REMOVED***.[0-9]***REMOVED***1,2***REMOVED***.[0-9]***REMOVED***1,2***REMOVED***?")
+	re := regexp.MustCompile("v[0-9]***REMOVED***1,2***REMOVED***.[0-9]***REMOVED***1,2***REMOVED***.[0-9]***REMOVED***1,2***REMOVED***?")
 	m := re.FindStringSubmatch(v)
 
 	if m != nil ***REMOVED***
@@ -414,6 +426,19 @@ func GetECSClusterName() (string, error) ***REMOVED***
 	***REMOVED***
 
 	return v, nil
+***REMOVED***
+
+// ToSlack writes the parsed feed data to a slack channel
+func ToSlack(message string) ***REMOVED***
+	api := slack.New(cfgSlack.Token)
+
+	params := slack.PostMessageParameters***REMOVED******REMOVED***
+
+	_, _, err := api.PostMessage(cfgSlack.Channel, message, params)
+
+	if err != nil ***REMOVED***
+		log.Error(err)
+	***REMOVED***
 ***REMOVED***
 
 func main() ***REMOVED***
