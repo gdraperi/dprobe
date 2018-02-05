@@ -1,0 +1,15 @@
+***REMOVED***
+    "resource": ***REMOVED***
+        "aws_instance": ***REMOVED***
+            "db": ***REMOVED***
+                "vpc": "foo",
+                "provisioner": [***REMOVED***
+                    "file": ***REMOVED***
+                        "source": "foo",
+                        "destination": "bar"
+                ***REMOVED***
+            ***REMOVED***]
+        ***REMOVED***
+		***REMOVED***
+	***REMOVED***
+***REMOVED***

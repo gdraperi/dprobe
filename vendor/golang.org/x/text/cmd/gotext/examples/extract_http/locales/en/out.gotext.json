@@ -1,0 +1,39 @@
+***REMOVED***
+    "language": "en",
+    "messages": [
+        ***REMOVED***
+            "id": "Hello ***REMOVED***From***REMOVED***!",
+            "message": "Hello ***REMOVED***From***REMOVED***!",
+            "translation": "Hello ***REMOVED***From***REMOVED***!",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                ***REMOVED***
+                    "id": "From",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "r.Header.Get(\"From\")"
+            ***REMOVED***
+            ],
+            "fuzzy": true
+    ***REMOVED***,
+        ***REMOVED***
+            "id": "Do you like your browser (***REMOVED***User_Agent***REMOVED***)?",
+            "message": "Do you like your browser (***REMOVED***User_Agent***REMOVED***)?",
+            "translation": "Do you like your browser (***REMOVED***User_Agent***REMOVED***)?",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                ***REMOVED***
+                    "id": "User_Agent",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "r.Header.Get(\"User-Agent\")"
+            ***REMOVED***
+            ],
+            "fuzzy": true
+    ***REMOVED***
+    ]
+***REMOVED***

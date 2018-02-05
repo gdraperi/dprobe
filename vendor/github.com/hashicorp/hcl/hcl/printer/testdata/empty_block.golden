@@ -1,0 +1,12 @@
+variable "foo" ***REMOVED******REMOVED***
+variable "foo" ***REMOVED******REMOVED***
+
+variable "foo" ***REMOVED***
+  # Standalone comment should be still here
+***REMOVED***
+
+foo ***REMOVED******REMOVED***
+
+foo ***REMOVED***
+  bar = "mssola"
+***REMOVED***

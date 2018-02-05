@@ -1,0 +1,7 @@
+resource "null_resource" "some_command" ***REMOVED***
+  provisioner "local-exec" ***REMOVED***
+    command = "$***REMOVED***echo '
+some newlines
+and additonal output'***REMOVED***"
+  ***REMOVED***
+***REMOVED***

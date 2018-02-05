@@ -1,0 +1,19 @@
+variable "foo" ***REMOVED******REMOVED***
+variable "bar" ***REMOVED******REMOVED***
+variable "baz" ***REMOVED******REMOVED***
+
+variable "qux" ***REMOVED******REMOVED***
+variable "foo" ***REMOVED*** foo = "bar" ***REMOVED***
+
+variable "foo" ***REMOVED******REMOVED***
+# lead comment
+variable "bar" ***REMOVED******REMOVED***
+
+variable "foo" ***REMOVED*** default = "bar" ***REMOVED***
+variable "bar" ***REMOVED******REMOVED***
+
+# Purposeful newline check below:
+
+variable "foo" ***REMOVED******REMOVED***
+
+variable "purposeful-newline" ***REMOVED******REMOVED***

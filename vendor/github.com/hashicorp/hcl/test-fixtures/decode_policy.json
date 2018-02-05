@@ -1,0 +1,19 @@
+***REMOVED***
+    "key": ***REMOVED***
+        "": ***REMOVED***
+            "policy": "read"
+    ***REMOVED***,
+
+        "foo/": ***REMOVED***
+            "policy": "write"
+    ***REMOVED***,
+
+        "foo/bar/": ***REMOVED***
+            "policy": "read"
+    ***REMOVED***,
+
+        "foo/bar/baz": ***REMOVED***
+            "policy": "deny"
+    ***REMOVED***
+***REMOVED***
+***REMOVED***

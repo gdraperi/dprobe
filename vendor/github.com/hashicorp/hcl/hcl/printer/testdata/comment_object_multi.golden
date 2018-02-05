@@ -1,0 +1,9 @@
+variable "environment" ***REMOVED***
+  default = ***REMOVED******REMOVED***
+
+  # default ***REMOVED***
+  #    "region" = "us-west-2"
+  #    "sg"     = "playground"
+  #    "env"    = "prod"
+  #  ***REMOVED***
+***REMOVED***

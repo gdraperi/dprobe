@@ -1,0 +1,154 @@
+***REMOVED***
+    "language": "en-US",
+    "messages": [
+        ***REMOVED***
+            "id": "Hello world!",
+            "message": "Hello world!",
+            "translation": "Hello world!"
+    ***REMOVED***,
+        ***REMOVED***
+            "id": "Hello ***REMOVED***City***REMOVED***!",
+            "message": "Hello ***REMOVED***City***REMOVED***!",
+            "translation": "Hello ***REMOVED***City***REMOVED***!",
+            "placeholders": [
+                ***REMOVED***
+                    "id": "City",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "city"
+            ***REMOVED***
+            ]
+    ***REMOVED***,
+        ***REMOVED***
+            "id": "***REMOVED***Person***REMOVED*** is visiting ***REMOVED***Place***REMOVED***!",
+            "message": "***REMOVED***Person***REMOVED*** is visiting ***REMOVED***Place***REMOVED***!",
+            "translation": "***REMOVED***Person***REMOVED*** is visiting ***REMOVED***Place***REMOVED***!",
+            "placeholders": [
+                ***REMOVED***
+                    "id": "Person",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "person",
+                    "comment": "The person of matter."
+            ***REMOVED***,
+                ***REMOVED***
+                    "id": "Place",
+                    "string": "%[2]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 2,
+                    "expr": "place",
+                    "comment": "Place the person is visiting."
+            ***REMOVED***
+            ]
+    ***REMOVED***,
+        ***REMOVED***
+            "id": "***REMOVED***2***REMOVED*** files remaining!",
+            "message": "***REMOVED***2***REMOVED*** files remaining!",
+            "translation": "***REMOVED***2***REMOVED*** files remaining!",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                ***REMOVED***
+                    "id": "2",
+                    "string": "%[1]d",
+                    "type": "int",
+                    "underlyingType": "int",
+                    "argNum": 1,
+                    "expr": "2"
+            ***REMOVED***
+            ],
+            "fuzzy": true
+    ***REMOVED***,
+        ***REMOVED***
+            "id": "***REMOVED***N***REMOVED*** more files remaining!",
+            "message": "***REMOVED***N***REMOVED*** more files remaining!",
+            "translation": ***REMOVED***
+                "select": ***REMOVED***
+                    "feature": "plural",
+                    "arg": "N",
+                    "cases": ***REMOVED***
+                        "one": ***REMOVED***
+                            "msg": "One file remaining!"
+                    ***REMOVED***,
+                        "other": ***REMOVED***
+                            "msg": "There are ***REMOVED***N***REMOVED*** more files remaining!"
+                    ***REMOVED***
+                ***REMOVED***
+            ***REMOVED***
+        ***REMOVED***,
+            "placeholders": [
+                ***REMOVED***
+                    "id": "N",
+                    "string": "%[1]d",
+                    "type": "int",
+                    "underlyingType": "int",
+                    "argNum": 1,
+                    "expr": "n"
+            ***REMOVED***
+            ]
+    ***REMOVED***,
+        ***REMOVED***
+            "id": "Use the following code for your discount: ***REMOVED***ReferralCode***REMOVED***",
+            "message": "Use the following code for your discount: ***REMOVED***ReferralCode***REMOVED***",
+            "translation": "Use the following code for your discount: ***REMOVED***ReferralCode***REMOVED***",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                ***REMOVED***
+                    "id": "ReferralCode",
+                    "string": "%[1]d",
+                    "type": "./testdata/test1.referralCode",
+                    "underlyingType": "int",
+                    "argNum": 1,
+                    "expr": "c"
+            ***REMOVED***
+            ],
+            "fuzzy": true
+    ***REMOVED***,
+        ***REMOVED***
+            "id": [
+                "msgOutOfOrder",
+                "***REMOVED***Device***REMOVED*** is out of order!"
+            ],
+            "message": "***REMOVED***Device***REMOVED*** is out of order!",
+            "translation": "***REMOVED***Device***REMOVED*** is out of order!",
+            "comment": "This comment wins.\n",
+            "placeholders": [
+                ***REMOVED***
+                    "id": "Device",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "device"
+            ***REMOVED***
+            ]
+    ***REMOVED***,
+        ***REMOVED***
+            "id": "***REMOVED***Miles***REMOVED*** miles traveled (***REMOVED***Miles_1***REMOVED***)",
+            "message": "***REMOVED***Miles***REMOVED*** miles traveled (***REMOVED***Miles_1***REMOVED***)",
+            "translation": "***REMOVED***Miles***REMOVED*** miles traveled (***REMOVED***Miles_1***REMOVED***)",
+            "placeholders": [
+                ***REMOVED***
+                    "id": "Miles",
+                    "string": "%.2[1]f",
+                    "type": "float64",
+                    "underlyingType": "float64",
+                    "argNum": 1,
+                    "expr": "miles"
+            ***REMOVED***,
+                ***REMOVED***
+                    "id": "Miles_1",
+                    "string": "%[1]f",
+                    "type": "float64",
+                    "underlyingType": "float64",
+                    "argNum": 1,
+                    "expr": "miles"
+            ***REMOVED***
+            ]
+    ***REMOVED***
+    ]
+***REMOVED***

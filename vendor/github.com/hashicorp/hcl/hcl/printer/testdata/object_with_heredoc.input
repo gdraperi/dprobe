@@ -1,0 +1,6 @@
+obj ***REMOVED***
+    foo = [<<EOF
+        TEXT!
+EOF
+    ]
+***REMOVED***

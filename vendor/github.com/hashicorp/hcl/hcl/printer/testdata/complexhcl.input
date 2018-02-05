@@ -1,0 +1,53 @@
+variable "foo" ***REMOVED***
+       default = "bar"
+    description =     "bar"
+***REMOVED***
+
+developer = [     "fatih",       "arslan"]
+
+provider "aws" ***REMOVED***
+                            access_key ="foo"
+     secret_key =         "bar"
+***REMOVED***
+
+          provider "do" ***REMOVED***
+  api_key = "$***REMOVED***var.foo***REMOVED***"
+***REMOVED***
+
+resource "aws_security_group" "firewall" ***REMOVED***
+          count = 5
+  ***REMOVED***
+
+    resource aws_instance "web" ***REMOVED***
+      ami = "$***REMOVED***var.foo***REMOVED***"
+           security_groups = [
+            "foo",
+            "$***REMOVED***aws_security_group.firewall.foo***REMOVED***"
+                  ]
+
+           network_interface ***REMOVED***
+                 device_index = 0
+                    description = "Main network interface"
+    ***REMOVED***
+
+           network_interface = ***REMOVED***
+                 device_index = 1
+                    description = <<EOF
+ANOTHER NETWORK INTERFACE
+EOF
+    ***REMOVED***
+***REMOVED***
+
+resource "aws_instance" "db" ***REMOVED***
+        security_groups = "$***REMOVED***aws_security_group.firewall.*.id***REMOVED***"
+    VPC = "foo"
+
+    depends_on = ["aws_instance.web"]
+***REMOVED***
+
+output "web_ip" ***REMOVED***
+
+    value=<<EOF
+TUBES
+EOF
+***REMOVED***

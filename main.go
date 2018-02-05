@@ -26,17 +26,87 @@ import (
 
 	// jsonq (easy json parsing)
 	"github.com/jmoiron/jsonq"
+
+	// CLI/config parsing
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
+var rootCmd = &cobra.Command***REMOVED***
+	Use:   "dprobe",
+	Short: "dprobe",
+	Long:  `dprobe`,
+	Run: func(cmd *cobra.Command, args []string) ***REMOVED***
+
+	***REMOVED***,
+***REMOVED***
+
 var (
-	cli      *client.Client
-	cfgSlack Slack
+	cfgDebug  bool
+	cli       *client.Client
+	cfgSlack  Slack
+	cfgOutput string
 )
 
 // Slack is the configuration for writing feed data to slack channels
 type Slack struct ***REMOVED***
 	Channel string
 	Token   string
+***REMOVED***
+
+func setFlags() ***REMOVED***
+	rootCmd.PersistentFlags().StringVarP(&cfgOutput, "output", "o", "stdout", "Sets the output method (slack, or stdout)")
+***REMOVED***
+
+// PreInit initializes initializes cobra
+func PreInit() ***REMOVED***
+	setFlags()
+
+	helpCmd := rootCmd.HelpFunc()
+
+	var helpFlag bool
+
+	newHelpCmd := func(c *cobra.Command, args []string) ***REMOVED***
+		helpFlag = true
+		helpCmd(c, args)
+	***REMOVED***
+	rootCmd.SetHelpFunc(newHelpCmd)
+
+	err := rootCmd.Execute()
+
+	if err != nil ***REMOVED***
+		log.Fatal(err)
+	***REMOVED***
+
+	if helpFlag ***REMOVED***
+		os.Exit(0)
+	***REMOVED***
+***REMOVED***
+
+// InitViper initializes viper (configuration file) and links cobra and viper
+func InitViper() ***REMOVED***
+	viper.BindPFlag("output", rootCmd.PersistentFlags().Lookup("output"))
+
+	viper.SetConfigName("dprobe")
+	viper.AddConfigPath(fmt.Sprintf("/etc/%s/", "dprobe"))
+	viper.AddConfigPath("/etc/")
+	viper.AddConfigPath(".")
+
+	err := viper.ReadInConfig()
+
+	if err != nil ***REMOVED***
+		log.Fatal(err)
+	***REMOVED***
+
+	err3 := viper.UnmarshalKey("slack", &cfgSlack)
+
+	if err3 != nil ***REMOVED***
+		log.Fatal(err3)
+	***REMOVED***
+
+	if cfgDebug ***REMOVED***
+		log.Println(viper.AllSettings())
+	***REMOVED***
 ***REMOVED***
 
 // GetContainers returns all containers
@@ -442,6 +512,9 @@ func ToSlack(message string) ***REMOVED***
 ***REMOVED***
 
 func main() ***REMOVED***
+	PreInit()
+	InitViper()
+
 	iz1, _ := GetHostname()
 	fmt.Println(iz1)
 

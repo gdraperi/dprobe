@@ -1,0 +1,82 @@
+***REMOVED***
+    "language": "en-US",
+    "messages": [
+        ***REMOVED***
+            "id": "Hello world!",
+            "key": "Hello world!\n",
+            "message": "Hello world!",
+            "translation":  "Hello world!",
+            "position": "golang.org/x/text/cmd/gotext/examples/extract/main.go:27:10"
+    ***REMOVED***,
+        ***REMOVED***
+            "id": "Hello ***REMOVED***City***REMOVED***!",
+            "key": "Hello %s!\n",
+            "message": "Hello ***REMOVED***City***REMOVED***!",
+            "translation": "Hello ***REMOVED***City***REMOVED***n"
+    ***REMOVED***,
+        ***REMOVED***
+            "id": "Hello ***REMOVED***Town***REMOVED***!",
+            "key": "Hello %s!\n",
+            "message": "Hello ***REMOVED***Town***REMOVED***!",
+            "translation": "Hello ***REMOVED***Town***REMOVED***!",
+            "placeholders": [
+                ***REMOVED***
+                    "id": "Town",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "town",
+                    "comment": "Town"
+            ***REMOVED***
+            ]
+    ***REMOVED***,
+        ***REMOVED***
+            "id": "***REMOVED***Person***REMOVED*** is visiting ***REMOVED***Place***REMOVED***!",
+            "key": "%s is visiting %s!\n",
+            "message": "***REMOVED***Person***REMOVED*** is visiting ***REMOVED***Place***REMOVED***!",
+            "translation": "***REMOVED***Person***REMOVED*** is visiting ***REMOVED***Place***REMOVED***!\n"
+    ***REMOVED***,
+        ***REMOVED***
+            "id": "***REMOVED***Person***REMOVED*** is visiting ***REMOVED***Place***REMOVED***!",
+            "key": "%[1]s is visiting %[3]s!\n",
+            "message": "***REMOVED***Person***REMOVED*** is visiting ***REMOVED***Place***REMOVED***!",
+            "translation": "***REMOVED***Person***REMOVED*** is visiting ***REMOVED***Place***REMOVED***!",
+            "comment": "Person visiting a place."
+    ***REMOVED***,
+        ***REMOVED***
+            "id": "***REMOVED***N***REMOVED*** more files remaining!",
+            "key": "%d more files remaining!",
+            "message": "***REMOVED***N***REMOVED*** more files remaining!",
+            "translation": ***REMOVED***
+                "select": ***REMOVED***
+                    "feature": "plural",
+                    "arg": "N",
+                    "cases": ***REMOVED***
+                        "one": "One file remaining!",
+                        "other": "There are ***REMOVED***N***REMOVED*** more files remaining!"
+                ***REMOVED***
+            ***REMOVED***
+        ***REMOVED***
+    ***REMOVED***,
+        ***REMOVED***
+            "id": "Use the following code for your discount: ***REMOVED***ReferralCode***REMOVED***",
+            "key": "Use the following code for your discount: %d\n",
+            "message": "Use the following code for your discount: ***REMOVED***ReferralCode***REMOVED***",
+            "translation": ""
+    ***REMOVED***,
+        ***REMOVED***
+            "id": [ "msgOutOfOrder", "***REMOVED***Device***REMOVED*** is out of order!" ],
+            "key": "%s is out of order!",
+            "message": "***REMOVED***Device***REMOVED*** is out of order!",
+            "translation": "***REMOVED***Device***REMOVED*** is out of order!",
+            "comment": "FOO\n"
+    ***REMOVED***,
+        ***REMOVED***
+            "id": "***REMOVED***Miles***REMOVED*** miles traveled (***REMOVED***Miles_1***REMOVED***)",
+            "key": "%.2[1]f miles traveled (%[1]f)",
+            "message": "***REMOVED***Miles***REMOVED*** miles traveled (***REMOVED***Miles_1***REMOVED***)",
+            "translation": "***REMOVED***Miles***REMOVED*** miles traveled (***REMOVED***Miles_1***REMOVED***)"
+    ***REMOVED***
+    ]
+***REMOVED***

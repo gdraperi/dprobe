@@ -1,0 +1,135 @@
+***REMOVED***
+    "language": "zh",
+    "messages": [
+        ***REMOVED***
+            "id": "Hello world!",
+            "key": "Hello world!\n",
+            "message": "Hello world!",
+            "translation": ""
+    ***REMOVED***,
+        ***REMOVED***
+            "id": "Hello ***REMOVED***City***REMOVED***!",
+            "key": "Hello %s!\n",
+            "message": "Hello ***REMOVED***City***REMOVED***!",
+            "translation": "",
+            "placeholders": [
+                ***REMOVED***
+                    "id": "City",
+                    "string": "%[1]s"
+            ***REMOVED***
+            ]
+    ***REMOVED***,
+        ***REMOVED***
+            "id": "Hello ***REMOVED***Town***REMOVED***!",
+            "key": "Hello %s!\n",
+            "message": "Hello ***REMOVED***Town***REMOVED***!",
+            "translation": "",
+            "placeholders": [
+                ***REMOVED***
+                    "id": "Town",
+                    "string": "%[1]s"
+            ***REMOVED***
+            ]
+    ***REMOVED***,
+        ***REMOVED***
+            "id": "***REMOVED***Person***REMOVED*** is visiting ***REMOVED***Place***REMOVED***!",
+            "key": "%s is visiting %s!\n",
+            "message": "***REMOVED***Person***REMOVED*** is visiting ***REMOVED***Place***REMOVED***!",
+            "translation": "",
+            "placeholders": [
+                ***REMOVED***
+                    "id": "Person",
+                    "string": "%[1]s"
+            ***REMOVED***,
+                ***REMOVED***
+                    "id": "Place",
+                    "string": "%[2]s"
+            ***REMOVED***
+            ]
+    ***REMOVED***,
+        ***REMOVED***
+            "id": "***REMOVED***Person***REMOVED*** is visiting ***REMOVED***Place***REMOVED***!",
+            "key": "%[1]s is visiting %[3]s!\n",
+            "message": "***REMOVED***Person***REMOVED*** is visiting ***REMOVED***Place***REMOVED***!",
+            "translation": "",
+            "placeholders": [
+                ***REMOVED***
+                    "id": "Person",
+                    "string": "%[1]s"
+            ***REMOVED***,
+                ***REMOVED***
+                    "id": "Place",
+                    "string": "%[3]s"
+            ***REMOVED***,
+                ***REMOVED***
+                    "id": "Extra",
+                    "string": "%[2]v"
+            ***REMOVED***
+            ]
+    ***REMOVED***,
+        ***REMOVED***
+            "id": "***REMOVED***2***REMOVED*** files remaining!",
+            "key": "%d files remaining!",
+            "message": "***REMOVED***2***REMOVED*** files remaining!",
+            "translation": "",
+            "placeholders": [
+                ***REMOVED***
+                    "id": "",
+                    "string": "%[1]d"
+            ***REMOVED***
+            ]
+    ***REMOVED***,
+        ***REMOVED***
+            "id": "***REMOVED***N***REMOVED*** more files remaining!",
+            "key": "%d more files remaining!",
+            "message": "***REMOVED***N***REMOVED*** more files remaining!",
+            "translation": "",
+            "placeholders": [
+                ***REMOVED***
+                    "id": "N",
+                    "string": "%[1]d"
+            ***REMOVED***
+            ]
+    ***REMOVED***,
+        ***REMOVED***
+            "id": "Use the following code for your discount: ***REMOVED***ReferralCode***REMOVED***",
+            "key": "Use the following code for your discount: %d\n",
+            "message": "Use the following code for your discount: ***REMOVED***ReferralCode***REMOVED***",
+            "translation": "",
+            "placeholders": [
+                ***REMOVED***
+                    "id": "ReferralCode",
+                    "string": "%[1]d"
+            ***REMOVED***
+            ]
+    ***REMOVED***,
+        ***REMOVED***
+            "id": [ "***REMOVED***Device***REMOVED*** is out of order!", "msgOutOfOrder" ],
+            "key": "%s is out of order!",
+            "message": "***REMOVED***Device***REMOVED*** is out of order!",
+            "translation": "",
+            "placeholders": [
+                ***REMOVED***
+                    "id": "Device",
+                    "string": "%[1]s"
+            ***REMOVED***
+            ]
+    ***REMOVED***,
+        ***REMOVED***
+            "id": "***REMOVED***Miles***REMOVED*** miles traveled (***REMOVED***Miles_1***REMOVED***)",
+            "key": "%.2[1]f miles traveled (%[1]f)",
+            "message": "***REMOVED***Miles***REMOVED*** miles traveled (***REMOVED***Miles_1***REMOVED***)",
+            "translation": "",
+            "placeholders": [
+                ***REMOVED***
+                    "id": "Miles",
+                    "string": "%.2[1]f"
+            ***REMOVED***,
+                ***REMOVED***
+                    "id": "Miles_1",
+                    "string": "%[1]f"
+            ***REMOVED***
+            ]
+    ***REMOVED***
+    ]
+***REMOVED***

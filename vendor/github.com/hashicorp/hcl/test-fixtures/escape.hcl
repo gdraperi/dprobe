@@ -1,0 +1,6 @@
+foo = "bar\"baz\\n"
+bar = "new\nline"
+qux = "back\\slash"
+qax = "slash\\:colon"
+nested = "$***REMOVED***HH\\:mm\\:ss***REMOVED***"
+nestedquotes = "$***REMOVED***"\"stringwrappedinquotes\""***REMOVED***"

@@ -1,0 +1,36 @@
+// A standalone comment is a comment which is not attached to any kind of node
+
+// This comes from Terraform, as a test
+variable "foo" ***REMOVED***
+  # Standalone comment should be still here
+
+  default     = "bar"
+  description = "bar" # yooo
+***REMOVED***
+
+/* This is a multi line standalone
+comment*/
+
+// fatih arslan
+/* This is a developer test
+account and a multine comment */
+developer = ["fatih", "arslan"] // fatih arslan
+
+# One line here
+numbers = [1, 2] // another line here
+
+# Another comment
+variable = ***REMOVED***
+  description = "bar" # another yooo
+
+  foo ***REMOVED***
+    # Nested standalone
+
+    bar = "fatih"
+  ***REMOVED***
+***REMOVED***
+
+// lead comment
+foo ***REMOVED***
+  bar = "fatih" // line comment 2 
+***REMOVED*** // line comment 3

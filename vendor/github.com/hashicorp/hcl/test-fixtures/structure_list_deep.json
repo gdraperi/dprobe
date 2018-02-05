@@ -1,0 +1,16 @@
+***REMOVED***
+    "bar": ***REMOVED***
+        "foo": ***REMOVED***
+            "name": "terraform_example",
+            "ingress": [
+                ***REMOVED***
+                    "from_port": 22
+            ***REMOVED***,
+                ***REMOVED***
+                    "from_port": 80
+            ***REMOVED***
+            ]
+    ***REMOVED***
+***REMOVED***
+***REMOVED***
+
