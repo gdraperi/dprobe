@@ -573,6 +573,7 @@ func main() ***REMOVED***
 		log.Fatal(err)
 	***REMOVED***
 
+	MakeOutput(cfgOutput, "Host Information")
 	iz1, err1 := GetHostname()
 	if err1 != nil ***REMOVED***
 		log.Fatal(err1)
@@ -609,6 +610,8 @@ func main() ***REMOVED***
 		MakeOutput(cfgOutput, "ECS Cluster:", iz5)
 	***REMOVED***
 
+	MakeOutput(cfgOutput, "\n")
+	MakeOutput(cfgOutput, "Docker Host Audit")
 	iz6, err6 := HasContainerSprawl(cli, 3)
 	if err6 != nil ***REMOVED***
 		log.Error(err6)
@@ -623,7 +626,50 @@ func main() ***REMOVED***
 	strconv.FormatBool(iz7)
 	MakeOutput(cfgOutput, "Image sprawl:", strconv.FormatBool(iz7))
 
+	iz17, err17 := HasStableDockerCEVersion()
+	if err17 != nil ***REMOVED***
+		log.Error(err17)
+	***REMOVED***
+	MakeOutput(cfgOutput, "Stable docker version:", strconv.FormatBool(iz17))
+
+	iz18, err18 := HasLiveRestore(cli)
+	if err18 != nil ***REMOVED***
+		log.Error(err18)
+	***REMOVED***
+	MakeOutput(cfgOutput, "Live Restore:", strconv.FormatBool(iz18))
+
+	iz19, err19 := FileOwnedByRoot("/var/lib/docker")
+	if err19 != nil ***REMOVED***
+		log.Error(err19)
+	***REMOVED***
+	MakeOutput(cfgOutput, "/var/lib/docker owned by root:", strconv.FormatBool(iz19))
+
+	iz20, err20 := FileOwnedByRoot("/etc/docker")
+	if err20 != nil ***REMOVED***
+		log.Error(err20)
+	***REMOVED***
+	MakeOutput(cfgOutput, "/etc/docker owned by root:", strconv.FormatBool(iz20))
+
+	iz21, err21 := FileOwnedByRoot("/etc/docker/daemon.json")
+	if err21 != nil ***REMOVED***
+		log.Error(err21)
+	***REMOVED***
+	MakeOutput(cfgOutput, "/etc/docker/daemon.json owned by root:", strconv.FormatBool(iz21))
+
+	iz22, err22 := FileOwnedByRoot("/usr/bin/docker-containerd")
+	if err22 != nil ***REMOVED***
+		log.Error(err22)
+	***REMOVED***
+	MakeOutput(cfgOutput, "/usr/bin/docker-containerd owned by root:", strconv.FormatBool(iz22))
+
+	iz23, err23 := FileOwnedByRoot("/usr/bin/docker-runc")
+	if err23 != nil ***REMOVED***
+		log.Error(err23)
+	***REMOVED***
+	MakeOutput(cfgOutput, "/usr/bin/docker-runc owned by root:", strconv.FormatBool(iz23))
+
 	for c := range containers ***REMOVED***
+		MakeOutput(cfgOutput, "\n")
 		MakeOutput(cfgOutput, "Container ID:", containers[c].ID)
 
 		iz8, err8 := HasPrivilegedExecution(cli, containers[c].ID)
@@ -680,48 +726,6 @@ func main() ***REMOVED***
 		***REMOVED***
 		MakeOutput(cfgOutput, "Has Host Devices:", strconv.FormatBool(iz16))
 	***REMOVED***
-
-	iz17, err17 := HasStableDockerCEVersion()
-	if err17 != nil ***REMOVED***
-		log.Error(err17)
-	***REMOVED***
-	MakeOutput(cfgOutput, "Stable docker version:", strconv.FormatBool(iz17))
-
-	iz18, err18 := HasLiveRestore(cli)
-	if err18 != nil ***REMOVED***
-		log.Error(err18)
-	***REMOVED***
-	MakeOutput(cfgOutput, "Live Restore:", strconv.FormatBool(iz18))
-
-	iz19, err19 := FileOwnedByRoot("/var/lib/docker")
-	if err19 != nil ***REMOVED***
-		log.Error(err19)
-	***REMOVED***
-	MakeOutput(cfgOutput, "/var/lib/docker owned by root:", strconv.FormatBool(iz19))
-
-	iz20, err20 := FileOwnedByRoot("/etc/docker")
-	if err20 != nil ***REMOVED***
-		log.Error(err20)
-	***REMOVED***
-	MakeOutput(cfgOutput, "/etc/docker owned by root:", strconv.FormatBool(iz20))
-
-	iz21, err21 := FileOwnedByRoot("/etc/docker/daemon.json")
-	if err21 != nil ***REMOVED***
-		log.Error(err21)
-	***REMOVED***
-	MakeOutput(cfgOutput, "/etc/docker/daemon.json owned by root:", strconv.FormatBool(iz21))
-
-	iz22, err22 := FileOwnedByRoot("/usr/bin/docker-containerd")
-	if err22 != nil ***REMOVED***
-		log.Error(err22)
-	***REMOVED***
-	MakeOutput(cfgOutput, "/usr/bin/docker-containerd owned by root:", strconv.FormatBool(iz22))
-
-	iz23, err23 := FileOwnedByRoot("/usr/bin/docker-runc")
-	if err23 != nil ***REMOVED***
-		log.Error(err23)
-	***REMOVED***
-	MakeOutput(cfgOutput, "/usr/bin/docker-runc owned by root:", strconv.FormatBool(iz23))
 
 	SendOutput(cfgOutput)
 ***REMOVED***
