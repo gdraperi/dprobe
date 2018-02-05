@@ -46,6 +46,7 @@ var (
 	cli       *client.Client
 	cfgSlack  Slack
 	cfgOutput string
+	message   string
 )
 
 // Slack is the configuration for writing feed data to slack channels
@@ -499,16 +500,40 @@ func GetECSClusterName() (string, error) ***REMOVED***
 ***REMOVED***
 
 // ToSlack writes the parsed feed data to a slack channel
-func ToSlack(message string) ***REMOVED***
+func ToSlack(data string) ***REMOVED***
 	api := slack.New(cfgSlack.Token)
 
 	params := slack.PostMessageParameters***REMOVED******REMOVED***
 
-	_, _, err := api.PostMessage(cfgSlack.Channel, message, params)
+	_, _, err := api.PostMessage(cfgSlack.Channel, data, params)
 
 	if err != nil ***REMOVED***
 		log.Error(err)
 	***REMOVED***
+***REMOVED***
+
+// MakeOutput formats output based on the type of output
+func MakeOutput(output string, data ...string) error ***REMOVED***
+	var line string
+
+	if output == "stdout" ***REMOVED***
+		for m := range data ***REMOVED***
+			if m != 0 ***REMOVED***
+				line = fmt.Sprintf("%s %s", line, data[m])
+			***REMOVED*** else ***REMOVED***
+				line = fmt.Sprintf("%s%s", line, data[m])
+			***REMOVED***
+		***REMOVED***
+	***REMOVED*** else if output == "slack" ***REMOVED***
+
+	***REMOVED*** else ***REMOVED***
+		return fmt.Errorf("Invalid output format")
+	***REMOVED***
+
+	line = fmt.Sprintf("%s\n", line)
+	message = message + line
+
+	return nil
 ***REMOVED***
 
 func main() ***REMOVED***
@@ -516,7 +541,9 @@ func main() ***REMOVED***
 	InitViper()
 
 	iz1, _ := GetHostname()
-	fmt.Println(iz1)
+
+	MakeOutput("stdout", "Hostname:", iz1)
+	fmt.Println(message)
 
 	iz2, _ := GetIPs()
 	fmt.Println(iz2)
