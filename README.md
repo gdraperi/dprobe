@@ -26,6 +26,9 @@ Docker security auditing tool
     - DONE: Image sprawl setting
     - DONE: Container sprawl setting
     - DONE: Output image name next to container name upon displaying container
+    - Output to slack
+    - stdout colorizing
+    - Link CIS benchmark numbers?
 - ECS agent:
     - Version check
     - DONE: Version get
