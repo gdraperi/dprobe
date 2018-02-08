@@ -102,6 +102,8 @@ func PreInit() ***REMOVED***
 // InitViper initializes viper (configuration file) and links cobra and viper
 func InitViper() ***REMOVED***
 	viper.BindPFlag("output", rootCmd.PersistentFlags().Lookup("output"))
+	viper.BindPFlag("csprawl", rootCmd.PersistentFlags().Lookup("csprawl"))
+	viper.BindPFlag("isprawl", rootCmd.PersistentFlags().Lookup("isprawl"))
 
 	viper.SetConfigName("dprobe")
 	viper.AddConfigPath(fmt.Sprintf("/etc/%s/", "dprobe"))
