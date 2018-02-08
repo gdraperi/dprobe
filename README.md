@@ -25,7 +25,7 @@ Docker security auditing tool
 - misc:
     - DONE: Image sprawl setting
     - DONE: Container sprawl setting
-    - Output image name next to container name upon displaying container
+    - DONE: Output image name next to container name upon displaying container
 - ECS agent:
     - Version check
     - DONE: Version get
