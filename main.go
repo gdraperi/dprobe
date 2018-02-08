@@ -43,11 +43,12 @@ var rootCmd = &cobra.Command***REMOVED***
 ***REMOVED***
 
 var (
-	cfgDebug  bool
-	cli       *client.Client
-	cfgSlack  Slack
-	cfgOutput string
-	message   string
+	cfgDebug       bool
+	cli            *client.Client
+	cfgSlack       Slack
+	cfgOutput      string
+	cfgImageSprawl uint32
+	message        string
 )
 
 // Slack is the configuration for writing feed data to slack channels
@@ -58,6 +59,7 @@ type Slack struct ***REMOVED***
 
 func setFlags() ***REMOVED***
 	rootCmd.PersistentFlags().StringVarP(&cfgOutput, "output", "o", "stdout", "Sets the output method (slack, or stdout)")
+	rootCmd.PersistentFlags().Uint32VarP(&cfgImageSprawl, "image_sprawl", "i", 100, "Sets the minimum image sprawl counter")
 ***REMOVED***
 
 // PreInit initializes initializes cobra
@@ -82,6 +84,11 @@ func PreInit() ***REMOVED***
 
 	if helpFlag ***REMOVED***
 		os.Exit(0)
+	***REMOVED***
+
+	if cfgImageSprawl <= 3 ***REMOVED***
+		log.Infof("%d is pretty low for image sprawl setting; setting to 10 instead...", cfgImageSprawl)
+		cfgImageSprawl = 10
 	***REMOVED***
 ***REMOVED***
 
@@ -619,7 +626,7 @@ func main() ***REMOVED***
 	strconv.FormatBool(iz6)
 	MakeOutput(cfgOutput, "Container sprawl:", strconv.FormatBool(iz6))
 
-	iz7, err7 := HasImageSprawl(cli, 2)
+	iz7, err7 := HasImageSprawl(cli, int(cfgImageSprawl))
 	if err7 != nil ***REMOVED***
 		log.Error(err7)
 	***REMOVED***
