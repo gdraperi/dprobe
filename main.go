@@ -685,8 +685,9 @@ func main() ***REMOVED***
 	MakeOutput(cfgOutput, "/usr/bin/docker-runc owned by root:", strconv.FormatBool(iz23))
 
 	for c := range containers ***REMOVED***
+		img := fmt.Sprintf("(%s)", containers[c].Image)
 		MakeOutput(cfgOutput, "\n")
-		MakeOutput(cfgOutput, "Container ID:", containers[c].ID)
+		MakeOutput(cfgOutput, "Container:", containers[c].ID, img)
 
 		iz8, err8 := HasPrivilegedExecution(cli, containers[c].ID)
 		if err8 != nil ***REMOVED***
