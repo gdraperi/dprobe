@@ -60,8 +60,8 @@ type Slack struct ***REMOVED***
 
 func setFlags() ***REMOVED***
 	rootCmd.PersistentFlags().StringVarP(&cfgOutput, "output", "o", "stdout", "Sets the output method (slack, or stdout)")
-	rootCmd.PersistentFlags().Uint32VarP(&cfgImageSprawl, "image_sprawl", "i", 100, "Sets the minimum image sprawl counter")
-	rootCmd.PersistentFlags().Uint32VarP(&cfgContainerSprawl, "container_sprawl", "c", 100, "Sets the minimum container sprawl counter")
+	rootCmd.PersistentFlags().Uint32VarP(&cfgImageSprawl, "isprawl", "i", 100, "Sets the minimum amount of images on a host to trip the image sprawl flag")
+	rootCmd.PersistentFlags().Uint32VarP(&cfgContainerSprawl, "csprawl", "c", 100, "Sets the minimum amount of containers on a host to trip the container sprawl flag")
 ***REMOVED***
 
 // PreInit initializes initializes cobra
