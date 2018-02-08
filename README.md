@@ -22,8 +22,12 @@ Docker security auditing tool
     - Disable swarm mode if it's not in use
 - DONE: Container sprawl
 - DONE: Image sprawl
+- misc:
+    - Image sprawl setting
+    - Container sprawl setting
 - ECS agent:
-    - DONE: Version check
+    - Version check
+    - DONE: Version get
     - DONE: Get cluster name
 - Info gather:
     - DONE: Get hostname
