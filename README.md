@@ -32,7 +32,7 @@ A tool to audit underlying docker host and containers. The audit information com
 ## Usage
 1. Download a release binary.
 2. Before running figure out the Docker API version you're running: `docker version` will tell you.
-3. To run the audit: `env DOCKER_API_VERSION="x.xx" ./dprobe`
+3. To run the audit: `env DOCKER_API_VERSION="x.xx" ./dprobe` (note: you most likely need to `sudo` to run at all [to access the docker socket and to stat files, etc.])
 
 ### Output
 - `--output`/`-o` supports `slack` or `stdout`; you must configure `dprobe.json` to output to slack.
